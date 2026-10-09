@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Panamá Luna de Miel</title>
+<meta name="description" content="App de viaje para una luna de miel en Panamá del 25 al 30 de noviembre de 2026: fotos, plan día a día en transporte público, mapa, noches electrónicas, Instagram a seguir y actividades sin nadar.">
+<meta property="og:title" content="Panamá · Luna de miel · 25–30 nov 2026">
+<meta property="og:description" content="Plan, mapa, noches electrónicas y San Blas sin nadar.">
+<meta property="og:image" content="img/sanblas.jpg">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PTY ♥">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="img/sanblas.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --bg:#f5f2ec; --surface:#fff; --surface-2:#eee8de; --text:#151b24; --muted:#5d6672; --line:#e4ddd0;
+  --accent:#e2365b; --accent-2:#0b5fa5; --ok:#2b7a4b; --warn:#b26f12; --sea:#0e8a8c;
+  --walk:#2b7a4b; --metro:#d01f3c; --bus:#e07b00; --uber:#151b24; --tour:#6d3fc0; --plane:#0b5fa5;
+  --shadow:0 1px 2px rgba(15,25,40,.06),0 8px 24px rgba(15,25,40,.08);
+  --r:20px; --serif:"Fraunces",Georgia,serif; --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --tabh:64px; --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1117; --surface:#161c24; --surface-2:#1f2731; --text:#e9edf2; --muted:#9aa6b4; --line:#29323d;
+  --accent:#ff5c7f; --accent-2:#6fb3f2; --ok:#6fd39a; --warn:#f1b95c; --sea:#4fd1c5;
+  --walk:#6fd39a; --metro:#ff6b81; --bus:#ffad4d; --uber:#e9edf2; --tour:#b597ff; --plane:#6fb3f2; --shadow:0 1px 2px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  --bg:#0d1117; --surface:#161c24; --surface-2:#1f2731; --text:#e9edf2; --muted:#9aa6b4; --line:#29323d;
+  --accent:#ff5c7f; --accent-2:#6fb3f2; --ok:#6fd39a; --warn:#f1b95c; --sea:#4fd1c5;
+  --walk:#6fd39a; --metro:#ff6b81; --bus:#ffad4d; --uber:#e9edf2; --tour:#b597ff; --plane:#6fb3f2; --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 var(--sans);overscroll-behavior-y:none}
+a{color:var(--accent-2)}
+h1,h2,h3{font-family:var(--serif);line-height:1.12;margin:0;letter-spacing:-.01em}
+button{font:inherit;color:inherit}
+img{display:block;max-width:100%}
+.muted{color:var(--muted)}
+.small{font-size:.84rem}
+.app{max-width:560px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:calc(var(--tabh) + var(--safe-b) + 16px)}
+@media (min-width:900px){
+  body{background:radial-gradient(1200px 600px at 20% 0%,color-mix(in srgb,var(--accent) 12%,transparent),transparent),radial-gradient(900px 600px at 100% 100%,color-mix(in srgb,var(--accent-2) 14%,transparent),transparent),var(--bg)}
+  .app{box-shadow:0 0 0 1px var(--line),0 30px 80px rgba(0,0,0,.18);background:var(--bg)}
+}
+
+/* views */
+.view{display:none;animation:vin .35s cubic-bezier(.2,.8,.2,1)}
+.view.on{display:block}
+@keyframes vin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.vhead{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(12px + var(--safe-t)) 16px 10px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4)}
+.vhead h2{font-size:1.6rem}
+.pad{padding:0 16px}
+.sec{margin:22px 0 0}
+.sech{display:flex;align-items:baseline;justify-content:space-between;padding:0 16px;margin-bottom:10px}
+.sech h3{font-size:1.25rem}
+.sech span{font-size:.8rem;color:var(--muted);font-weight:600}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;width:38px;height:38px;display:grid;place-items:center;cursor:pointer;flex:none}
+
+/* tab bar */
+.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + var(--safe-b));z-index:60;width:min(540px,calc(100% - 20px));display:grid;grid-template-columns:repeat(5,1fr);background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6);border:1px solid var(--line);border-radius:22px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.tab{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:16px;cursor:pointer;color:var(--muted);font-size:.68rem;font-weight:700;position:relative}
+.tab svg{width:22px;height:22px}
+.tab.on{color:var(--text);background:var(--surface-2)}
+.tab.night.on{background:linear-gradient(135deg,#ff3ea5,#7b5cff);color:#fff}
+
+/* hero */
+.hero{position:relative;height:min(78vh,620px);overflow:hidden;border-radius:0 0 28px 28px;color:#fff;background:#111}
+.hero .slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease}
+.hero .slide.on{opacity:1}
+.hero .slide img{width:100%;height:100%;object-fit:cover;transform:scale(1.08);transition:transform 7s linear}
+.hero .slide.on img{transform:scale(1)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,0) 28%,rgba(0,0,0,0) 45%,rgba(0,0,0,.78) 100%)}
+.hero .top{position:absolute;z-index:2;top:calc(14px + var(--safe-t));left:16px;right:16px;display:flex;justify-content:space-between;align-items:center}
+.hero .top .iconbtn{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3);color:#fff;backdrop-filter:blur(10px)}
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:999px;padding:6px 12px;font-weight:700;font-size:.82rem}
+.hero .txt{position:absolute;z-index:2;left:18px;right:18px;bottom:22px}
+.hero h1{font-size:clamp(2.5rem,11vw,3.6rem);text-shadow:0 2px 20px rgba(0,0,0,.35)}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hero .cap{position:absolute;z-index:2;right:12px;bottom:6px;font-size:.62rem;opacity:.75}
+.hero .dots{display:flex;gap:5px;margin-top:14px}
+.hero .dots i{width:18px;height:3px;border-radius:3px;background:rgba(255,255,255,.4)}
+.hero .dots i.on{background:#fff}
+
+/* stories */
+.stories{display:flex;gap:14px;overflow-x:auto;padding:4px 16px 6px;scrollbar-width:none;scroll-snap-type:x proximity}
+.stories::-webkit-scrollbar{display:none}
+.story{flex:none;width:74px;border:0;background:none;cursor:pointer;text-align:center;scroll-snap-align:start;padding:0}
+.ring{width:70px;height:70px;border-radius:50%;padding:3px;background:conic-gradient(from 210deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5,#feda75);margin:0 auto}
+.ring.seen{background:var(--line)}
+.ring .av{width:100%;height:100%;border-radius:50%;border:3px solid var(--bg);overflow:hidden;background:var(--surface-2);display:grid;place-items:center;font-size:1.6rem}
+.ring .av img{width:100%;height:100%;object-fit:cover}
+.story b{display:block;font-size:.68rem;font-weight:600;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.rail{display:flex;gap:12px;overflow-x:auto;padding:2px 16px 10px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.pcard{flex:none;width:72%;max-width:330px;aspect-ratio:4/5;border-radius:24px;overflow:hidden;position:relative;scroll-snap-align:start;cursor:pointer;color:#fff;border:0;padding:0;text-align:left;background:#222;box-shadow:var(--shadow)}
+.pcard img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.pcard:hover img{transform:scale(1.04)}
+.pcard::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.82))}
+.pcard .in{position:absolute;z-index:2;left:14px;right:14px;bottom:14px}
+.pcard .in h4{font:800 1.3rem/1.15 var(--serif);margin:6px 0 4px}
+.pcard .in p{margin:0;font-size:.8rem;opacity:.9}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;font-weight:800;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3)}
+.badge.ok{background:rgba(43,122,75,.85);border-color:transparent}
+.badge.sea{background:rgba(14,138,140,.85);border-color:transparent}
+.badge.warn{background:rgba(178,111,18,.9);border-color:transparent}
+.pcard .tl{position:absolute;z-index:2;top:12px;left:12px;display:flex;gap:6px;flex-wrap:wrap}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 16px 10px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-weight:700;font-size:.84rem;cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px}
+.tile{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:1/1.1;cursor:pointer;border:0;padding:0;background:#222;color:#fff;text-align:left}
+.tile img{width:100%;height:100%;object-fit:cover}
+.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.8))}
+.tile .in{position:absolute;z-index:2;left:10px;right:10px;bottom:10px}
+.tile .in b{display:block;font-size:.95rem;line-height:1.2}
+.tile .in span{font-size:.72rem;opacity:.9}
+.tile .tl{position:absolute;z-index:2;top:8px;left:8px}
+.tile.ph,.pcard.ph{background:linear-gradient(135deg,var(--c1,#e2365b),var(--c2,#7b5cff))}
+.ph .emo{position:absolute;inset:0;display:grid;place-items:center;font-size:3.4rem;z-index:1}
+
+/* today widget */
+.today{margin:16px 16px 0;display:grid;grid-template-columns:96px 1fr;gap:12px;padding:10px;align-items:center;cursor:pointer}
+.today img{width:96px;height:96px;object-fit:cover;border-radius:14px}
+.today .k{font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.today h4{font:800 1.15rem/1.2 var(--serif);margin:2px 0}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px}
+.fact{padding:10px;text-align:center}
+.fact .e{font-size:1.4rem}
+.fact b{display:block;font-size:.85rem;margin-top:2px}
+.fact span{font-size:.7rem;color:var(--muted)}
+.wx{margin:0 16px;display:grid;grid-template-columns:1.2fr 1.2fr 1fr;border-radius:18px;overflow:hidden;border:1px solid var(--line)}
+.wx div{padding:12px 6px;text-align:center;font-size:.76rem;font-weight:700}
+.wx .e{font-size:1.4rem;display:block}
+.wx .m{background:#fff4cf;color:#6b4b00}.wx .a{background:#d9e6f5;color:#173d66}.wx .n{background:#272247;color:#e9e4ff}
+
+/* plan */
+.daychips{display:flex;gap:8px;overflow-x:auto;padding:0 16px 12px;scrollbar-width:none;scroll-snap-type:x proximity}
+.daychips::-webkit-scrollbar{display:none}
+.dchip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:8px 12px;cursor:pointer;text-align:left;min-width:78px;scroll-snap-align:start}
+.dchip small{display:block;font-size:.66rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.dchip b{font-size:.95rem}
+.dchip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.dchip.on small{color:color-mix(in srgb,var(--bg) 70%,transparent)}
+.dchip .hoy{display:inline-block;background:var(--accent);color:#fff;font-size:.6rem;border-radius:6px;padding:0 5px;margin-left:4px;vertical-align:2px}
+.dayhero{margin:0 16px;height:190px;border-radius:24px;overflow:hidden;position:relative;color:#fff}
+.dayhero img{width:100%;height:100%;object-fit:cover}
+.dayhero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.75))}
+.dayhero .in{position:absolute;z-index:2;left:16px;right:16px;bottom:14px}
+.dayhero h3{font-size:1.45rem}
+.dayhero .modes{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.dayhero .modes span{background:rgba(255,255,255,.2);backdrop-filter:blur(8px);border-radius:999px;padding:2px 9px;font-size:.74rem;font-weight:800}
+.swipehint{text-align:center;font-size:.72rem;color:var(--muted);margin:8px 0 2px}
+.stops{list-style:none;margin:10px 0 0;padding:0 16px}
+.stop{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:stretch}
+.stop .num{display:flex;flex-direction:column;align-items:center}
+.stop .num i{width:28px;height:28px;border-radius:50%;background:var(--text);color:var(--bg);display:grid;place-items:center;font-style:normal;font-weight:800;font-size:.8rem;flex:none}
+.stop.night .num i{background:linear-gradient(135deg,#ff3ea5,#7b5cff);color:#fff}
+.stop .num::after{content:"";flex:1;width:2px;background:var(--line);margin:4px 0}
+.stop .box{display:flex;gap:10px;align-items:center;padding:10px;margin-bottom:6px;border-radius:18px;background:var(--surface);border:1px solid var(--line);cursor:default;text-align:left;width:100%}
+.stop .box.link{cursor:pointer}
+.stop .box .t{font-size:.72rem;font-weight:800;color:var(--muted)}
+.stop .box b{display:block;line-height:1.25;font-size:.95rem}
+.stop .box .n{font-size:.8rem;color:var(--muted);margin-top:2px}
+.stop .box img,.stop .box .ph2{width:64px;height:64px;border-radius:14px;object-fit:cover;flex:none;margin-left:auto}
+.stop .box .ph2{display:grid;place-items:center;font-size:1.7rem;background:var(--surface-2)}
+.stop.night .box{background:#1b1636;border-color:#3a3170;color:#efeaff}
+.stop.night .box .n,.stop.night .box .t{color:#b4abd6}
+.leg{display:grid;grid-template-columns:34px 1fr;gap:10px;margin:-2px 0 6px}
+.leg .l{justify-self:center;width:3px;border-radius:3px;background:var(--c)}
+.leg .lt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.78rem;padding:4px 0}
+.mchip{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:#fff;background:var(--c);border-radius:999px;padding:2px 9px;font-size:.74rem}
+:root[data-theme="dark"] .mchip{color:#0d1117}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .mchip{color:#0d1117}}
+.leg .lt .tx{color:var(--muted)}
+.leg .lt b{font-weight:800}
+.note{margin:12px 16px 0;padding:12px 14px;border-radius:16px;display:flex;gap:10px;font-size:.86rem;align-items:flex-start}
+.note .e{font-size:1.4rem;line-height:1}
+.note.tip{background:color-mix(in srgb,var(--sea) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--sea) 30%,transparent)}
+.note.info{background:color-mix(in srgb,var(--accent-2) 12%,var(--surface));border:1px solid color-mix(in srgb,var(--accent-2) 30%,transparent)}
+.note.warn{background:color-mix(in srgb,var(--accent) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+
+/* map view */
+.seg{display:inline-flex;background:var(--surface-2);border-radius:12px;padding:3px}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:10px;font-weight:700;font-size:.84rem;cursor:pointer}
+.seg button.on{background:var(--surface);box-shadow:var(--shadow)}
+#mapWrap{position:relative;margin:0 16px;border-radius:24px;overflow:hidden;border:1px solid var(--line);height:calc(100vh - 210px);min-height:420px}
+#map{position:absolute;inset:0;z-index:1;background:var(--surface-2)}
+.mapchips{position:absolute;z-index:500;top:10px;left:0;right:0;display:flex;gap:6px;overflow-x:auto;padding:0 10px;scrollbar-width:none}
+.mapchips::-webkit-scrollbar{display:none}
+.mapchips button{flex:none;border:0;border-radius:999px;padding:7px 12px;font-weight:700;font-size:.8rem;background:rgba(255,255,255,.95);color:#151b24;box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer}
+.mapchips button.off{opacity:.5}
+.locbtn{position:absolute;z-index:500;right:10px;bottom:12px;border:0;border-radius:14px;background:#fff;color:#151b24;padding:10px 12px;font-weight:800;font-size:.8rem;box-shadow:0 2px 10px rgba(0,0,0,.25);cursor:pointer}
+.pin{display:grid;place-items:center;width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);overflow:hidden}
+.pin span{transform:rotate(45deg);font-size:14px;line-height:1}
+.pin.photo{border-radius:50%;transform:none;width:40px;height:40px;border:3px solid #fff}
+.pin.photo img{width:100%;height:100%;object-fit:cover}
+.pin.hotel{width:44px;height:44px;border-color:var(--accent)}
+.me{width:16px;height:16px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 6px rgba(26,115,232,.25)}
+.metro-svg{width:100%;height:auto;background:var(--surface);border:1px solid var(--line);border-radius:24px}
+.metro-svg text{font-family:var(--sans);fill:var(--text)}
+.metro-svg .mu{fill:var(--muted)}
+.howlist{display:grid;gap:10px;padding:0 16px}
+.how{display:flex;gap:12px;align-items:center;padding:10px;cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:18px;text-align:left;width:100%}
+.how img,.how .ph2{width:58px;height:58px;border-radius:14px;object-fit:cover;flex:none}
+.how .ph2{display:grid;place-items:center;font-size:1.5rem;background:var(--surface-2)}
+.how b{display:block;font-size:.92rem}
+.chain{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.chain .s{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:999px;font-weight:800;font-size:.7rem;color:#fff;background:var(--c)}
+:root[data-theme="dark"] .chain .s{color:#0d1117}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chain .s{color:#0d1117}}
+.how .cost{margin-left:auto;text-align:right;font-weight:800;font-size:.85rem;white-space:nowrap}
+.how .cost small{display:block;color:var(--muted);font-weight:600;font-size:.7rem}
+.infogrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px}
+.info{padding:12px}
+.info .e{font-size:1.4rem}
+.info b{display:block;margin-top:4px;font-size:.9rem}
+.info span{display:block;font-size:.78rem;color:var(--muted);line-height:1.35;margin-top:2px}
+
+/* night view */
+#v-noche{background:#0b0a16;color:#efeaff;min-height:100vh;margin-bottom:calc(-1 * (var(--tabh) + var(--safe-b) + 16px));padding-bottom:calc(var(--tabh) + var(--safe-b) + 24px)}
+#v-noche .vhead{background:rgba(11,10,22,.82)}
+#v-noche .vhead h2{background:linear-gradient(90deg,#ff3ea5,#36e2ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#v-noche .muted{color:#b4abd6}
+#v-noche .sech span{color:#b4abd6}
+#v-noche .chip{background:#1b1636;border-color:#3a3170;color:#efeaff}
+#v-noche .chip.on{background:linear-gradient(90deg,#ff3ea5,#7b5cff);border-color:transparent;color:#fff}
+#v-noche .ring .av{border-color:#0b0a16}
+#v-noche a{color:#36e2ff}
+.poster{flex:none;width:66%;max-width:300px;aspect-ratio:3/4;border-radius:22px;overflow:hidden;position:relative;scroll-snap-align:start;cursor:pointer;border:0;padding:0;background:#222;color:#fff;text-align:left}
+.poster img{width:100%;height:100%;object-fit:cover;filter:saturate(1.2) contrast(1.05)}
+.poster::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(123,92,255,.1),rgba(11,10,22,.92))}
+.poster .in{position:absolute;z-index:2;left:14px;right:14px;bottom:14px}
+.poster .when{font-weight:800;font-size:.75rem;color:#36e2ff;letter-spacing:.06em;text-transform:uppercase}
+.poster h4{font:800 1.5rem/1.05 var(--sans);text-transform:uppercase;letter-spacing:-.01em;margin:4px 0}
+.poster p{margin:0;font-size:.8rem;color:#d7d0f5}
+.vrow{display:flex;gap:12px;align-items:center;padding:10px 16px;border:0;background:none;width:100%;text-align:left;cursor:pointer;color:inherit}
+.vrow img,.vrow .ph2{width:62px;height:62px;border-radius:12px;object-fit:cover;flex:none}
+.vrow .ph2{display:grid;place-items:center;font-size:1.6rem;background:#1b1636}
+.vrow b{display:block;font-size:.98rem}
+.vrow .sub{font-size:.78rem;color:#b4abd6}
+.vrow .g{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.gt{font-size:.62rem;font-weight:800;padding:2px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:.04em}
+.g-tech{background:#3b1650;color:#ff8fd1}.g-house{background:#14364a;color:#7fe3ff}.g-roof{background:#3d2a12;color:#ffc56b}.g-cock{background:#173a2a;color:#7ff0b2}.g-latin{background:#47152a;color:#ff9db4}.g-lgbt{background:linear-gradient(90deg,#5b1a3a,#1a3a5b);color:#fff}
+.vrow .ar{margin-left:auto;color:#7b5cff;font-weight:800}
+.crawl{position:relative;margin:0 16px;padding:14px;border-radius:22px;background:linear-gradient(135deg,#1b1636,#141030);border:1px solid #3a3170}
+.crawl ol{list-style:none;margin:0;padding:0}
+.crawl li{display:grid;grid-template-columns:52px 1fr;gap:10px;padding:6px 0;position:relative}
+.crawl li .h{font-weight:800;color:#36e2ff;font-size:.8rem}
+.crawl li b{display:block}
+.crawl li span{font-size:.78rem;color:#b4abd6}
+.nsafe{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px}
+.nsafe div{background:#1b1636;border:1px solid #2e2758;border-radius:16px;padding:10px;font-size:.78rem;color:#b4abd6}
+.nsafe div b{display:block;color:#fff;font-size:.86rem;margin:2px 0}
+.ra{display:flex;align-items:center;gap:12px;margin:0 16px;padding:14px;border-radius:20px;background:linear-gradient(90deg,#ff3ea5,#7b5cff);color:#fff!important;text-decoration:none;font-weight:800}
+.ra span{font-size:1.6rem}
+.ra small{display:block;font-weight:600;opacity:.9}
+
+/* more view */
+.mtabs{display:flex;gap:8px;overflow-x:auto;padding:0 16px 12px;scrollbar-width:none}
+.mtabs::-webkit-scrollbar{display:none}
+.mpane{display:none;padding:0 16px}
+.mpane.on{display:block;animation:vin .3s}
+.pass{display:grid;grid-template-columns:1fr 92px;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);margin-bottom:12px}
+.pass .main{padding:14px 16px}
+.pass .stub{position:relative;color:#fff;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:10px;font-weight:800;font-size:.72rem;text-align:center;border-left:2px dashed rgba(255,255,255,.7)}
+.pass .stub img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.55)}
+.pass .stub span{position:relative}
+.pass .lbl{font-size:.68rem;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.pass .rr{display:flex;align-items:center;gap:8px;margin:6px 0}
+.pass .code{font:800 1.8rem/1 var(--serif)}
+.pass .tm{font-weight:800;font-variant-numeric:tabular-nums}
+.pass .dash{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--muted) 0 6px,transparent 6px 12px);position:relative}
+.pass .dash::after{content:"✈";position:absolute;left:50%;top:-11px;transform:translateX(-50%);background:var(--surface);padding:0 4px;color:var(--muted)}
+.hotel{overflow:hidden;margin-bottom:12px}
+.hotel img{width:100%;height:170px;object-fit:cover}
+.hotel .in{padding:14px 16px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tags span,.tags a{font-size:.74rem;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--surface-2);text-decoration:none;color:var(--text)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:8px 0 0}
+.steps li{counter-increment:s;display:flex;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(s);flex:none;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;font-size:.75rem;display:grid;place-items:center}
+.box{padding:14px 16px;margin-bottom:12px}
+.box h4{font:800 1.1rem var(--serif);margin:0 0 6px}
+.tier{display:inline-flex;background:var(--surface-2);border-radius:12px;padding:3px;margin-bottom:10px}
+.tier button{border:0;background:transparent;padding:7px 12px;border-radius:10px;font-weight:700;font-size:.82rem;cursor:pointer}
+.tier button.on{background:var(--surface);box-shadow:var(--shadow)}
+.crow{display:grid;grid-template-columns:26px 1fr 84px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.crow:last-child{border-bottom:0}
+.crow label{font-size:.86rem;line-height:1.2}
+.crow label small{display:block;color:var(--muted);font-size:.72rem}
+.crow input,.fx input{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font:700 .9rem var(--sans);text-align:right}
+.total{padding:16px;margin-bottom:12px;background:linear-gradient(135deg,var(--text),color-mix(in srgb,var(--text) 80%,var(--accent)));color:var(--bg);border:0}
+.total .big{font:800 2.4rem/1 var(--serif)}
+.stack{display:flex;height:12px;border-radius:99px;overflow:hidden;margin:12px 0 8px;background:rgba(255,255,255,.2)}
+.stack span{height:100%}
+.slg{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.72rem;opacity:.85}
+.slg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
+.fx{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:.82rem}
+.fx input{width:80px;background:rgba(255,255,255,.12);color:inherit;border-color:rgba(255,255,255,.25)}
+.progressring{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.check{list-style:none;padding:0;margin:0}
+.check li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+.check li:last-child{border-bottom:0}
+.check input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin-top:1px}
+.check input:checked+label{color:var(--muted);text-decoration:line-through}
+.src{font-size:.8rem;padding-left:1.1em}
+.src li{margin:3px 0}
+.credits{font-size:.72rem;color:var(--muted);padding-left:1.1em}
+.credits li{margin:2px 0}
+
+/* sheet */
+.scrim{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;z-index:90;left:50%;bottom:0;width:min(560px,100%);max-height:92vh;transform:translate(-50%,105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);background:var(--surface);border-radius:26px 26px 0 0;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 -10px 40px rgba(0,0,0,.3)}
+.sheet.on{transform:translate(-50%,0)}
+.sheet .grab{position:absolute;z-index:5;top:8px;left:50%;transform:translateX(-50%);width:44px;height:5px;border-radius:5px;background:rgba(255,255,255,.85);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.sheet .close{position:absolute;z-index:5;top:12px;right:12px;background:rgba(0,0,0,.45);color:#fff;border:0}
+.sheet .body{overflow-y:auto;padding-bottom:calc(20px + var(--safe-b))}
+.gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;height:280px;background:#111}
+.gal::-webkit-scrollbar{display:none}
+.gal figure{flex:none;width:100%;height:100%;margin:0;scroll-snap-align:start;position:relative}
+.gal img{width:100%;height:100%;object-fit:cover}
+.gal figcaption{position:absolute;left:10px;bottom:8px;font-size:.62rem;color:#fff;background:rgba(0,0,0,.45);padding:2px 7px;border-radius:999px;max-width:80%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gal .ill{position:absolute;top:44px;left:10px;font-size:.66rem;font-weight:800;color:#fff;background:rgba(178,111,18,.9);padding:2px 8px;border-radius:999px}
+.gdots{display:flex;justify-content:center;gap:5px;margin-top:-18px;position:relative;z-index:3;height:18px}
+.gdots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5)}
+.gdots i.on{background:#fff}
+.sheet .ph-big{height:200px;display:grid;place-items:center;font-size:4rem;background:linear-gradient(135deg,var(--c1,#e2365b),var(--c2,#7b5cff))}
+.sheet .cnt{padding:16px}
+.sheet h3{font-size:1.6rem}
+.kv{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.kv span{font-size:.78rem;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--surface-2)}
+.kv .w0{background:color-mix(in srgb,var(--ok) 18%,var(--surface));color:var(--ok)}
+.kv .w1{background:color-mix(in srgb,var(--sea) 18%,var(--surface));color:var(--sea)}
+.kv .w2{background:color-mix(in srgb,var(--warn) 18%,var(--surface));color:var(--warn)}
+.sheet p{margin:0 0 12px;font-size:.92rem}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:14px}
+.abtn{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px;border-radius:14px;font-weight:800;font-size:.86rem;text-decoration:none;border:1px solid var(--line);background:var(--surface-2);color:var(--text)}
+.abtn.pri{background:var(--text);color:var(--bg);border-color:var(--text)}
+.abtn.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;border:0}
+.howbox{margin-top:6px;padding:12px;border-radius:16px;background:var(--surface-2)}
+.howbox b{font-size:.8rem}
+
+/* story viewer */
+.sv{position:fixed;inset:0;z-index:120;background:#000;display:none}
+.sv.on{display:block}
+.sv .stage{position:absolute;inset:0;max-width:520px;margin:0 auto;overflow:hidden;color:#fff}
+.sv .bg{position:absolute;inset:0}
+.sv .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.1) 25%,rgba(0,0,0,.35) 50%,rgba(0,0,0,.88) 100%)}
+.sv .bg img{width:100%;height:100%;object-fit:cover;filter:brightness(.55) saturate(1.1);animation:kb 7s linear forwards}
+@keyframes kb{from{transform:scale(1.12)}to{transform:scale(1)}}
+.sv .bars{position:absolute;z-index:3;top:calc(10px + var(--safe-t));left:10px;right:10px;display:flex;gap:4px}
+.sv .bars i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.35);overflow:hidden}
+.sv .bars i span{display:block;height:100%;width:0;background:#fff}
+.sv .hd{position:absolute;z-index:3;top:calc(22px + var(--safe-t));left:12px;right:12px;display:flex;align-items:center;gap:10px}
+.sv .hd .av{width:38px;height:38px;border-radius:50%;overflow:hidden;border:2px solid #fff;flex:none}
+.sv .hd .av img{width:100%;height:100%;object-fit:cover}
+.sv .hd b{font-size:.92rem}
+.sv .hd small{display:block;font-size:.7rem;opacity:.85}
+.sv .hd .x{margin-left:auto;background:rgba(255,255,255,.18);border:0;color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.1rem;cursor:pointer;flex:none}
+.sv .body{position:absolute;z-index:3;left:18px;right:18px;bottom:calc(110px + var(--safe-b));pointer-events:none}
+.sv .body .k{display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.18);padding:4px 10px;border-radius:999px;backdrop-filter:blur(8px)}
+.sv .body h3{font:800 2rem/1.05 var(--serif);margin:10px 0}
+.sv .body ul{margin:0;padding-left:1.1em;font-size:.98rem}
+.sv .body li{margin:4px 0}
+.sv .body .when{margin-top:12px;font-size:.86rem;background:rgba(0,0,0,.35);border-radius:14px;padding:10px 12px}
+.sv .cta{position:absolute;z-index:4;left:18px;right:18px;bottom:calc(36px + var(--safe-b));display:flex;align-items:center;justify-content:center;gap:8px;padding:15px;border-radius:16px;font-weight:800;text-decoration:none;color:#fff;background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}
+.sv .tapL,.sv .tapR{position:absolute;z-index:2;top:80px;bottom:120px}
+.sv .tapL{left:0;width:35%}.sv .tapR{right:0;width:65%}
+.sv .ver{font-size:.7rem;opacity:.85;margin-top:8px}
+
+.toast{position:fixed;z-index:200;left:50%;bottom:calc(var(--tabh) + var(--safe-b) + 24px);transform:translateX(-50%) translateY(20px);opacity:0;background:var(--text);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.85rem;transition:all .25s;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- ============ INICIO ============ -->
+<section class="view" id="v-inicio" data-view="inicio">
+  <div class="hero" id="hero">
+    <div class="top"><span class="pill">💍 Luna de miel</span><button class="iconbtn" id="themeBtn" aria-label="Cambiar tema">◐</button></div>
+    <div class="txt">
+      <div class="pill" id="countdown">…</div>
+      <h1 style="margin-top:10px">Panamá</h1>
+      <div class="meta"><span class="pill">📅 25–30 nov 2026</span><span class="pill">🏨 Riu Plaza</span><span class="pill">✈️ CM 462</span></div>
+      <div class="dots" id="heroDots"></div>
+    </div>
+    <div class="cap" id="heroCap"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sech"><h3>Síganlos antes de ir</h3><span>toquen un círculo</span></div>
+    <div class="stories" id="storiesHome"></div>
+  </div>
+
+  <div class="card today" id="todayCard"></div>
+
+  <div class="sec">
+    <div class="sech"><h3>Los imperdibles</h3><span>desliza →</span></div>
+    <div class="rail" id="mustRail"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sech"><h3>Explorar</h3><span id="exploreCount"></span></div>
+    <div class="chips" id="exploreChips"></div>
+    <div class="grid2" id="exploreGrid"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sech"><h3>Su clima en noviembre</h3><span>23–29 °C</span></div>
+    <div class="wx"><div class="m"><span class="e">☀️</span>6–13 h<br>salir</div><div class="a"><span class="e">🌧️</span>13–18 h<br>aguacero</div><div class="n"><span class="e">🌙</span>noche<br>fresca</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="facts">
+      <div class="card fact"><div class="e">💵</div><b>USD</b><span>billetes chicos</span></div>
+      <div class="card fact"><div class="e">🕐</div><b>= Lima</b><span>UTC-5</span></div>
+      <div class="card fact"><div class="e">🚇</div><b>$0.35</b><span>Metro contactless</span></div>
+      <div class="card fact"><div class="e">🏊‍♂️</div><b>Sin nadar</b><span>todo el plan</span></div>
+      <div class="card fact"><div class="e">🎉</div><b>Sáb 28</b><span>feriado patrio</span></div>
+      <div class="card fact"><div class="e">🚨</div><b>911</b><span>emergencias</span></div>
+    </div>
+  </div>
+  <p class="small muted pad" style="margin-top:18px;text-align:center">Toquen ⬇️ "Más" para ver reservas, presupuesto, checklist y fuentes.</p>
+</section>
+
+<!-- ============ PLAN ============ -->
+<section class="view" id="v-plan" data-view="plan">
+  <div class="vhead"><h2>El plan</h2><span class="small muted" id="planSub"></span></div>
+  <div class="daychips" id="dayChips"></div>
+  <div id="dayBody"></div>
+</section>
+
+<!-- ============ MAPA ============ -->
+<section class="view" id="v-mapa" data-view="mapa">
+  <div class="vhead"><h2>Moverse</h2><div class="seg" id="mapSeg"><button class="on" data-pane-go="map">Mapa</button><button data-pane-go="metro">Metro</button><button data-pane-go="how">Rutas</button></div></div>
+  <div data-pane="map">
+    <div id="mapWrap">
+      <div id="map" role="region" aria-label="Mapa interactivo"></div>
+      <div class="mapchips" id="mapChips"></div>
+      <button class="locbtn" id="locBtn">📍 ¿Dónde estoy?</button>
+    </div>
+    <p class="small muted pad" style="margin-top:8px">Toquen una foto del mapa para ver los detalles y cómo llegar.</p>
+  </div>
+  <div data-pane="metro" hidden>
+    <div class="pad">
+      <svg class="metro-svg" viewBox="0 0 360 600" role="img" aria-label="Esquema de las líneas 1 y 2 del Metro de Panamá">
+        <line x1="60" y1="40" x2="60" y2="350" stroke="var(--metro)" stroke-width="8" stroke-linecap="round"/>
+        <line x1="60" y1="350" x2="60" y2="372" stroke="var(--metro)" stroke-width="8" stroke-dasharray="2 6" stroke-linecap="round"/>
+        <path d="M60 330 C 60 360, 120 360, 120 390 L120 520" fill="none" stroke="#1f8a3a" stroke-width="8" stroke-linecap="round"/>
+        <path d="M120 470 C 120 495, 180 495, 180 520 L180 560" fill="none" stroke="#1f8a3a" stroke-width="6" stroke-linecap="round"/>
+        <line x1="120" y1="520" x2="120" y2="545" stroke="#1f8a3a" stroke-width="8" stroke-dasharray="2 6" stroke-linecap="round"/>
+        <text x="22" y="26" font-size="12" font-weight="800" fill="var(--metro)">LÍNEA 1 · $0.35</text>
+        <text x="140" y="404" font-size="12" font-weight="800" fill="#1f8a3a">LÍNEA 2 · $0.50</text>
+        <g font-size="13">
+          <circle cx="60" cy="50" r="8" fill="var(--surface)" stroke="var(--metro)" stroke-width="4"/><text x="78" y="47" font-weight="800">Albrook</text><text x="78" y="62" class="mu" font-size="11">🚌 Terminal de buses · 🛍️ Albrook Mall</text>
+          <circle cx="60" cy="100" r="8" fill="var(--surface)" stroke="var(--metro)" stroke-width="4"/><text x="78" y="97" font-weight="800">5 de Mayo</text><text x="78" y="112" class="mu" font-size="11">🚶 Casco Viejo 20′ · Mercado de Mariscos 8′</text>
+          <circle cx="60" cy="140" r="5" fill="var(--metro)"/><text x="78" y="144" class="mu">Lotería</text>
+          <circle cx="60" cy="170" r="5" fill="var(--metro)"/><text x="78" y="174" class="mu">Santo Tomás</text>
+          <circle cx="60" cy="210" r="11" fill="var(--accent)" stroke="var(--surface)" stroke-width="3"/><text x="54" y="215" font-size="12" fill="#fff">★</text>
+          <text x="78" y="206" font-weight="800">Iglesia del Carmen</text><text x="78" y="221" class="mu" font-size="11">🏨 Riu Plaza a 10′ a pie · su estación</text>
+          <circle cx="60" cy="250" r="8" fill="var(--surface)" stroke="var(--metro)" stroke-width="4"/><text x="78" y="247" font-weight="800">Vía Argentina</text><text x="78" y="262" class="mu" font-size="11">🎧 El Cangrejo: bares y electrónica</text>
+          <text x="78" y="292" class="mu" font-size="11">· · · 4 estaciones · · ·</text>
+          <circle cx="60" cy="330" r="10" fill="var(--surface)" stroke="var(--text)" stroke-width="4"/><text x="78" y="327" font-weight="800">San Miguelito</text><text x="78" y="342" class="mu" font-size="11">🔁 transbordo a la Línea 2</text>
+          <text x="22" y="390" class="mu" font-size="10">→ Villa Zaita</text>
+          <text x="140" y="436" class="mu" font-size="11">· · · 9 estaciones · · ·</text>
+          <circle cx="120" cy="470" r="10" fill="var(--surface)" stroke="var(--text)" stroke-width="4"/><text x="140" y="467" font-weight="800">Corredor Sur</text><text x="140" y="482" class="mu" font-size="11">🔁 tren del ramal al aeropuerto</text>
+          <circle cx="180" cy="530" r="5" fill="#1f8a3a"/><text x="196" y="534" class="mu">ITSE</text>
+          <circle cx="180" cy="562" r="11" fill="var(--plane)" stroke="var(--surface)" stroke-width="3"/><text x="173" y="567" font-size="12" fill="#fff">✈</text>
+          <text x="198" y="559" font-weight="800">Aeropuerto</text><text x="198" y="574" class="mu" font-size="11">≈ 60–75′ desde el Riu · $0.85</text>
+          <text x="92" y="560" class="mu" font-size="10">→ Nuevo Tocumen</text>
+        </g>
+      </svg>
+    </div>
+    <div class="sec infogrid">
+      <div class="card info"><div class="e">💳</div><b>Pagar con tarjeta</b><span>Visa o Mastercard contactless en el torniquete, o la tarjeta Metro ($2). Una por persona.</span></div>
+      <div class="card info"><div class="e">🚪</div><b>Validar al salir</b><span>Desde septiembre de 2026 el pasaje se cobra al salir.</span></div>
+      <div class="card info"><div class="e">🚌</div><b>MiBus $0.25</b><span>Se paga con la misma tarjeta Metro. Vean las rutas en vivo en la app Moovit.</span></div>
+      <div class="card info"><div class="e">🕐</div><b>Horario</b><span>Lun–vie 5–23 · sáb 5–22 · dom y feriados 7–22</span></div>
+    </div>
+  </div>
+  <div data-pane="how" hidden>
+    <div class="note info" style="margin-top:0;margin-bottom:12px"><span class="e">🚇</span><div><b>Transporte público primero.</b> Uber o InDrive solo de noche (el Metro cierra y las calles junto al Casco no son seguras), para las excursiones o donde no llega el bus.</div></div>
+    <div class="howlist" id="howList"></div>
+  </div>
+</section>
+
+<!-- ============ NOCHE ============ -->
+<section class="view" id="v-noche" data-view="noche">
+  <div class="vhead"><h2>Noche en PTY</h2><span class="small muted">🎧 electrónica · rooftops</span></div>
+  <div class="sec" style="margin-top:6px">
+    <div class="sech"><h3>Colectivos y raves</h3><span>revisen hacia el 20/11</span></div>
+    <div class="stories" id="storiesNight"></div>
+  </div>
+  <a class="ra sec" href="https://ra.co/events/pa/all" target="_blank" rel="noopener"><span>🎟️</span><div>Resident Advisor · Panamá<small>Las fiestas electrónicas de la semana, con entradas</small></div></a>
+  <div class="sec">
+    <div class="sech"><h3>Su gran noche</h3><span>sáb 28 · feriado</span></div>
+    <div class="rail" id="nightPosters"></div>
+  </div>
+  <div class="sec">
+    <div class="sech"><h3>Recorrido sugerido</h3><span>Casco Viejo</span></div>
+    <div class="crawl"><ol>
+      <li><span class="h">20:00</span><div><b>Cena en el Casco</b><span>🚇 Metro + 🚶, antes de las 22:00</span></div></li>
+      <li><span class="h">22:00</span><div><b>The Strangers Club</b><span>🍸 cócteles de autor para la previa</span></div></li>
+      <li><span class="h">23:30</span><div><b>Tántalo rooftop</b><span>🌃 DJ todas las noches · jue–sáb hasta las 4:00</span></div></li>
+      <li><span class="h">01:00</span><div><b>Casa Jaguar o Moloko+</b><span>🎧 patio electrónico o techno underground</span></div></li>
+      <li><span class="h">03:00</span><div><b>Uber al Riu</b><span>🚕 ≈ $6–10 · ≈ 15′, desde la puerta del local</span></div></li>
+    </ol></div>
+  </div>
+  <div class="sec">
+    <div class="sech"><h3>Dónde salir</h3><span id="nightCount"></span></div>
+    <div class="chips" id="nightChips"></div>
+    <div id="nightList"></div>
+    <p class="small muted pad">⚠️ Varias fichas vienen de guías de 2023–2024. Antes de ir, revisen el Instagram o Google Maps del local.</p>
+  </div>
+  <div class="sec">
+    <div class="sech"><h3>Salir tranquilos</h3></div>
+    <div class="nsafe">
+      <div>🚕<b>Vuelta en app</b>Desde la puerta. Nada de caminar por Santa Ana ni El Chorrillo.</div>
+      <div>🪪<b>Identificación</b>Algunos locales piden el pasaporte original.</div>
+      <div>🥤<b>Tu vaso a la vista</b>No acepten tragos de desconocidos.</div>
+      <div>👟<b>Dress code</b>En discotecas, nada de shorts ni sandalias.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MÁS ============ -->
+<section class="view" id="v-mas" data-view="mas">
+  <div class="vhead"><h2>Más</h2><button class="iconbtn" id="shareBtn" aria-label="Compartir">↗</button></div>
+  <div class="mtabs" id="mTabs">
+    <button class="chip on" data-m="reservas">🎫 Reservas</button>
+    <button class="chip" data-m="presupuesto">💰 Presupuesto</button>
+    <button class="chip" data-m="checklist">✅ Checklist</button>
+    <button class="chip" data-m="info">ℹ️ Datos útiles</button>
+    <button class="chip" data-m="fuentes">📚 Fuentes</button>
+  </div>
+
+  <div class="mpane on" data-m="reservas">
+    <div class="pass"><div class="main"><div class="lbl">Ida · Copa CM 462 · mié 25 nov</div><div class="rr"><div><div class="code">LIM</div><div class="tm">07:00</div></div><div class="dash"></div><div style="text-align:right"><div class="code">PTY</div><div class="tm">10:39</div></div></div><div class="small muted">Llega a la Terminal 2 · solo equipaje de mano</div></div><div class="stub"><img src="img/copa.jpg" alt="" loading="lazy"><span>🧳<br>10 kg</span></div></div>
+    <div class="pass"><div class="main"><div class="lbl">Vuelta · Copa CM 489 · lun 30 nov</div><div class="rr"><div><div class="code">PTY</div><div class="tm">18:59</div></div><div class="dash"></div><div style="text-align:right"><div class="code">LIM</div><div class="tm">22:45</div></div></div><div class="small muted">Estar en Tocumen a las 16:00</div></div><div class="stub"><img src="img/tocumen.jpg" alt="" loading="lazy"><span>🧳<br>10 kg</span></div></div>
+    <div class="card hotel"><img src="img/riu.jpg" alt="Hotel Riu Plaza Panamá" loading="lazy"><div class="in"><h4 style="font:800 1.25rem var(--serif);margin:0">Riu Plaza Panamá · 5 noches</h4><div class="small muted">Calle 50 con 53 Este, Marbella</div>
+      <div class="tags"><span>🔑 Check-in mié 15:00</span><span>🚪 Check-out lun 12:00</span><span>🥐 Desayuno incluido</span><span>🛏️ Cama extragrande</span><span>🏊 Piscina</span><span>🧳 Guardaequipaje</span><span>🚇 Iglesia del Carmen a 10′</span><a href="https://www.riu.com/es/hotel/panama/ciudad-de-panama/hotel-riu-plaza-panama/" target="_blank" rel="noopener">🌐 riu.com</a></div></div></div>
+    <div class="card box"><h4>🚐 Traslado Koi</h4><div class="note info" style="margin:6px 0 10px"><span class="e">📍</span><div>Al salir de aduanas, los esperan en la <b>puerta P17 de la Terminal 2</b>.</div></div><div class="tags"><a href="tel:+5078000302">📞 +507 800-0302</a><a href="https://wa.me/971524374965" target="_blank" rel="noopener">💬 WhatsApp</a><a href="mailto:bookings@koiride.com">✉️ Correo</a></div><p class="small muted" style="margin:8px 0 0">¿Cubre también el regreso? Si no, el plan los lleva al aeropuerto en Metro ($0.85).</p></div>
+    <div class="card box" style="border:2px solid var(--accent)"><h4>📞 ≈ Mié 18 nov: llamar al Riu</h4><ol class="steps"><li>Confirmar la llegada (≈ 12:00) y pedir <b>early check-in</b></li><li>Confirmar el <b>recojo en el aeropuerto</b></li><li>Pedir <b>piso alto con buena vista</b></li><li>Contar que es su <b>luna de miel</b> 💍</li><li>Pedir <b>late check-out</b> el lunes (vuelo a las 18:59)</li><li><b>Desayuno para llevar</b> el viernes 27 (salen a San Blas a las 5:00)</li></ol></div>
+    <p class="small muted">Por seguridad, los códigos de reserva no están en esta página pública.</p>
+  </div>
+
+  <div class="mpane" data-m="presupuesto">
+    <div class="card total"><div class="small" style="opacity:.8;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Total estimado · para los dos</div><div class="big" id="totUsd">$0</div><div id="totPen" style="opacity:.85"></div><div class="stack" id="stack"></div><div class="slg" id="slg"></div><div class="fx"><label for="fx">S/ por USD</label><input id="fx" type="number" step="0.01" min="1" value="3.45" inputmode="decimal"></div><div class="small" id="perDay" style="margin-top:8px;opacity:.9"></div></div>
+    <div class="tier" id="tierSeg"><button data-t="eco">🎒 Económico</button><button data-t="mid" class="on">⭐ Medio</button><button data-t="pre">💎 Premium</button></div>
+    <div class="card box" id="calcRows"></div>
+    <p class="small muted">Sin vuelos ni hotel (ya pagados). Incluye un 10 % para imprevistos. Valores estimados.</p>
+  </div>
+
+  <div class="mpane" data-m="checklist">
+    <div class="card box"><div class="progressring"><svg width="54" height="54" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--surface-2)" stroke-width="4"/><circle id="ringP" cx="18" cy="18" r="15.9" fill="none" stroke="var(--ok)" stroke-width="4" stroke-dasharray="0 100" stroke-linecap="round" transform="rotate(-90 18 18)"/></svg><div><b id="progTxt" style="font-size:1.1rem">0/0</b><div class="small muted">Se guarda en este celular</div></div></div>
+    <h4>Antes de viajar</h4><ul class="check">
+      <li><input type="checkbox" id="c0"><label for="c0">📞 ≈ 18 nov: llamar al Riu (ver la lista en Reservas)</label></li>
+      <li><input type="checkbox" id="c9"><label for="c9">🚐 Confirmar con Koi (y si cubre el regreso)</label></li>
+      <li><input type="checkbox" id="c12"><label for="c12">🏝️ Reservar San Blas por el día (vie 27) y el tour de los monos (sáb 28)</label></li>
+      <li><input type="checkbox" id="c13"><label for="c13">🍽️ Reservar Maito (jue 26) y Fonda Lo Que Hay (mié 25)</label></li>
+      <li><input type="checkbox" id="c16"><label for="c16">📲 Seguir las cuentas de Instagram de la app</label></li>
+      <li><input type="checkbox" id="c14"><label for="c14">🎧 ≈ 20 nov: revisar en RA las fiestas del fin de semana</label></li>
+      <li><input type="checkbox" id="c2"><label for="c2">💉 Vacuna contra la fiebre amarilla y carné (antes del 15 de noviembre)</label></li>
+      <li><input type="checkbox" id="c1"><label for="c1">🛂 Pasaportes (más una copia en la nube)</label></li>
+      <li><input type="checkbox" id="c5"><label for="c5">🛡️ Seguro de viaje</label></li>
+      <li><input type="checkbox" id="c6"><label for="c6">💵 Dólares en billetes chicos</label></li>
+      <li><input type="checkbox" id="c7"><label for="c7">💳 Tarjeta contactless habilitada para el exterior</label></li>
+      <li><input type="checkbox" id="c15"><label for="c15">📱 Instalar Moovit y Uber, y descargar el mapa offline</label></li>
+      <li><input type="checkbox" id="c17"><label for="c17">📲 Agregar esta app a la pantalla de inicio</label></li>
+      <li><input type="checkbox" id="c10"><label for="c10">✈️ Web check-in con Copa 24 h antes</label></li>
+      <li><input type="checkbox" id="c11"><label for="c11">🛂 Prerregistro de Migraciones Perú (48 h antes)</label></li>
+    </ul>
+    <h4 style="margin-top:14px">Maleta de mano (10 kg)</h4><ul class="check">
+      <li><input type="checkbox" id="m0"><label for="m0">💧 Líquidos en envases de 100 ml o menos</label></li>
+      <li><input type="checkbox" id="m1"><label for="m1">👕 Ropa ligera + un abrigo delgado para el aire acondicionado</label></li>
+      <li><input type="checkbox" id="m2"><label for="m2">☂️ Impermeable o paraguas plegable</label></li>
+      <li><input type="checkbox" id="m5"><label for="m5">📱 Funda impermeable para el celular (lancha)</label></li>
+      <li><input type="checkbox" id="m9"><label for="m9">👗 Un look para la cena especial y otro para la discoteca</label></li>
+      <li><input type="checkbox" id="m11"><label for="m11">💊 Pastilla para el mareo (lancha a San Blas)</label></li>
+    </ul></div>
+  </div>
+
+  <div class="mpane" data-m="info">
+    <div class="infogrid" style="padding:0">
+      <div class="card info"><div class="e">🛂</div><b>Pasaporte con 3+ meses</b><span>Mejor con 6. El DNI no sirve. Lleven el boleto de vuelta y la dirección del hotel.</span></div>
+      <div class="card info"><div class="e">💰</div><b>Solvencia de US$500</b><span>En efectivo o con tarjeta. Pueden pedirla en migración.</span></div>
+      <div class="card info"><div class="e">🆓</div><b>Sin visa</b><span>Turismo hasta 90 días. Verifiquen en la Cancillería.</span></div>
+      <div class="card info"><div class="e">💉</div><b>Fiebre amarilla</b><span>Recomendada (más aún para San Blas). Pueden pedírsela a quien llega desde Perú.</span></div>
+      <div class="card info"><div class="e">🔌</div><b>Enchufes A/B a 120 V</b><span>Los cargadores sirven. La plancha o secadora peruana, no.</span></div>
+      <div class="card info"><div class="e">🧾</div><b>Impuesto 7 %</b><span>10 % en hoteles y alcohol. Propina del 10 % (revisen si ya la cobraron).</span></div>
+      <div class="card info"><div class="e">🛡️</div><b>Seguridad</b><span>Nivel 2 (precaución). De noche, eviten El Chorrillo, Santa Ana y Curundú.</span></div>
+      <div class="card info"><div class="e">🏛️</div><b>Embajada del Perú</b><span>Torre Global Bank, Calle 50, piso 35 (cerca del Riu).</span></div>
+      <div class="card info"><div class="e">📶</div><b>Internet</b><span>+Móvil y Tigo, o eSIM. En San Blas casi no hay señal.</span></div>
+      <div class="card info"><div class="e">🗣️</div><b>"¡Qué xopá!"</b><span>¿Qué tal? · buco = mucho · chuleta = ¡wow! · fren = amigo</span></div>
+    </div>
+  </div>
+
+  <div class="mpane" data-m="fuentes">
+    <div class="card box"><h4>Fuentes</h4><ul class="src">
+      <li><a href="https://www.tourismpanama.com/plan-your-trip/travel-requirements/" target="_blank" rel="noopener">Promtur: requisitos de entrada</a></li>
+      <li><a href="https://pancanal.com/wp-content/uploads/2025/12/2095-0100-ENTRADAS-CV.pdf" target="_blank" rel="noopener">ACP: tarifas de Miraflores y Agua Clara</a></li>
+      <li><a href="https://visitcanaldepanama.com/es/miraflores/" target="_blank" rel="noopener">Visit Canal: Miraflores</a></li>
+      <li><a href="https://www.patronatopanamaviejo.org/" target="_blank" rel="noopener">Patronato Panamá Viejo</a> · <a href="https://biomuseo.org/" target="_blank" rel="noopener">Biomuseo</a></li>
+      <li><a href="https://www.laestrella.com.pa/panama/informacion-util/metro-de-panama-horarios-tarifas-y-guia-del-transporte-publico-NK16580580" target="_blank" rel="noopener">La Estrella: Metro</a> · <a href="https://www.laestrella.com.pa/panama/nacional/metro-de-panama-aclara-el-nuevo-sistema-de-cobro-asi-funcionara-tu-tarjeta-KN25398323" target="_blank" rel="noopener">cobro al salir</a></li>
+      <li><a href="https://destinopanama.com.pa/2026/03/mi-bus-mantendra-la-tarifa-del-pasaje-pero-reducira-operaciones-en-algunas-rutas/" target="_blank" rel="noopener">MiBus 2026</a> · <a href="https://pty.life/explore-panama-city-metro-bus/" target="_blank" rel="noopener">rutas de bus</a></li>
+      <li><a href="https://pty.life/panama-electronic-music/" target="_blank" rel="noopener">pty.life: escena electrónica</a> · <a href="https://www.timeout.com/panama-city/things-to-do/best-things-to-do-in-panama-city" target="_blank" rel="noopener">Time Out</a> · <a href="https://www.petitfute.co.uk/p46-panama/c1169-s-amuser-sortir/c1045-club-discotheque/" target="_blank" rel="noopener">Petit Futé</a></li>
+      <li><a href="https://www.tantalohotel.com/" target="_blank" rel="noopener">Tántalo (horarios del rooftop)</a></li>
+      <li><a href="https://newsinamerica.com/pdcc/boletin/2025/panama-celebra-la-presencia-de-seis-restaurantes-en-la-lista-de-latin-americas-50-best-restaurants-2025/" target="_blank" rel="noopener">50 Best 2025</a></li>
+      <li><a href="https://www.telemetro.com/nacionales/calendario-dias-festivos-panama-2026-conoce-los-feriados-y-dias-libres-n6065177" target="_blank" rel="noopener">Feriados 2026</a> · <a href="https://travel.state.gov/en/international-travel/travel-advisories/panama.html" target="_blank" rel="noopener">Aviso de viaje de EE. UU.</a></li>
+      <li><a href="https://planpty.com/blog/guia-san-blas" target="_blank" rel="noopener">Guía de San Blas</a> · <a href="https://www.riu.com/es/hotel/panama/ciudad-de-panama/hotel-riu-plaza-panama/" target="_blank" rel="noopener">Riu</a></li>
+      <li>Instagram verificados en las webs oficiales: <a href="https://www.tourismpanama.com/" target="_blank" rel="noopener">Promtur</a>, <a href="https://visitcanaldepanama.com/" target="_blank" rel="noopener">Canal</a>, <a href="https://biomuseo.org/" target="_blank" rel="noopener">Biomuseo</a>, <a href="https://www.elmetrodepanama.com/" target="_blank" rel="noopener">Metro</a>, <a href="https://www.imhpa.gob.pa/" target="_blank" rel="noopener">IMHPA</a></li>
+      <li>Diseño inspirado en patrones de apps de viaje vistos en <a href="https://mobbin.com" target="_blank" rel="noopener">Mobbin</a></li>
+      <li>Mapa: © colaboradores de <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></li>
+    </ul></div>
+    <div class="card box"><h4>📷 Créditos de las fotos</h4><p class="small muted" style="margin:0 0 6px">Fotos reales de Wikimedia Commons con licencias libres. Las marcadas como "ilustrativa" no son del lugar exacto.</p><ul class="credits" id="credits"></ul></div>
+  </div>
+</section>
+
+</div>
+
+<!-- tab bar -->
+<nav class="tabbar" id="tabbar" aria-label="Secciones">
+  <button class="tab" data-go="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</button>
+  <button class="tab" data-go="plan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>Plan</button>
+  <button class="tab" data-go="mapa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>Moverse</button>
+  <button class="tab night" data-go="noche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><rect x="2" y="14" width="5" height="7" rx="2"/><rect x="17" y="14" width="5" height="7" rx="2"/></svg>Noche</button>
+  <button class="tab" data-go="mas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Más</button>
+</nav>
+
+<!-- bottom sheet -->
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Detalle del lugar"><div class="grab"></div><button class="iconbtn close" id="sheetClose" aria-label="Cerrar">✕</button><div class="body" id="sheetBody"></div></div>
+
+<!-- story viewer -->
+<div class="sv" id="sv" role="dialog" aria-modal="true" aria-label="Historias de Instagram"><div class="stage" id="svStage"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function(){
+var store={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return [].slice.call((r||document).querySelectorAll(s))}
+function img(id){return 'img/'+id+'.jpg'}
+function toast(t){var el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('on')},1800)}
+function buzz(){try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}}
+
+/* ---------- photo credits ---------- */
+var CRED={"miraflores":["Alexey Komarov","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Cruise_ship_passing_Miraflores_Locks_2019-10-24.jpg"],"miraflores2":["Adam Jones","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Locomotives_Tow_Container_Ship_through_Miraflores_Locks_-_Panama_Canal.jpg"],"casco":["RB Photo","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Casco_Viejo,_Panama_City,_Panama_-_54301629817.jpg"],"casco2":["MusikAnimal","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Street_in_Casco_Viejo,_Panama_City_2013.JPG"],"casconight":["Felipe Valduga","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Casco_Viejo_at_night.jpg"],"plazafrancia":["M.vanicatte","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Plaza_de_Francia_-_Panama.jpg"],"sanjose":["Edwin Graell","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Altar_de_oro_iglesia_de_San_Jos%C3%A9_Pm%C3%A1.jpg"],"sanblas":["Ayaita","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Guna_Yala_Island.jpg"],"sanblas2":["Mónica J. Mora","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Isla_Perro_en_la_Comarca_Guna_Yala.JPG"],"sanblas3":["Garcia.dennis","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Banco_de_Arena_-_San_Blas_-_Guna_Yala.jpg"],"ancon":["Kiam-shim","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Bandera_de_Panam%C3%A1_en_el_Cerro_Anc%C3%B3n.jpg"],"gatun":["Dr. Thomas Liptak","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Panama,_Gatun_Lake_1.jpg"],"monkey":["Rhododendrites","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Panamanian_white-faced_capuchins_(81622)2.jpg"],"sloth":["Stefan Laube (Tauchgurke)","Public domain","https://commons.wikimedia.org/wiki/File:Bradypus.jpg"],"embera":["Yves Picq","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Panama_Embera_0619.jpg"],"portobelo":["Tedder","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Portobelo_Ruins_and_bay.jpg"],"aguaclara":["Mariordo (Mario Roberto Durán Ortiz)","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Agua_Clara_Locks_09_2019_0713.jpg"],"taboga":["Ayaita","CC BY 3.0","https://commons.wikimedia.org/wiki/File:IslaTaboga.JPG"],"skynight":["Nelson de Witt","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:The_lights_of_Panama_City.jpg"],"metro":["Panamafly","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Alstom_Metropolis_trainset_-_Metro_de_Panama.jpg"],"metro2":["Mariordo (Mario Roberto Durán Ortiz)","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Metro_Panama_03_2015_1570.JPG"],"riu":["Christian Córdova","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Hotel_Riu_Plaza_Panam%C3%A1.jpg"],"tocumen":["TomasVial","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Terminal_2_of_International_Airport_of_Tocumen.jpg"],"copa":["EEJCC","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Copa_Airlines_aircraft_parked_at_Tocumen_Terminal_2.jpg"],"club":["Arnold Jaeger Werner","CC BY 2.0","https://commons.wikimedia.org/wiki/File:Bob_Beaman_Nightclub_Munich_1.jpg"],"bartender":["Crew crew","CC0","https://commons.wikimedia.org/wiki/File:Bartenders_serving_cocktail_(Unsplash).jpg"],"sanblas4":["Ayaita","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Caba%C3%B1as_Guna_Yala.jpg"],"panviejo":["Gualberto107","CC BY-SA 3.0","https://commons.wikimedia.org/wiki/File:Tower_of_the_Cathedral_at_Old_Panama_City_ruins.jpg"],"biomuseo":["Editorpana","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Biomuseo_panama.jpg"],"biomuseo2":["Norcasa","CC BY 4.0","https://commons.wikimedia.org/wiki/File:Biomuseo,_Panam%C3%A1.jpg"],"amador":["Edwinosb","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Causeway_de_Amador_17-12-14.jpg"],"amador2":["Carlos Colina","Public domain","https://commons.wikimedia.org/wiki/File:Panama_from_Isla_Flamenco.JPG"],"taboga2":["Garcia.dennis","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Calle_en_Isla_Taboga_-_Panam%C3%A1.jpg"],"mercado":["Virpana","CC0","https://commons.wikimedia.org/wiki/File:Mercado_de_Mariscos_(Ciudad_de_Panam%C3%A1,_Panam%C3%A1).jpg"],"mercado2":["ProtoplasmaKid","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Interior_del_mercado_de_mariscos_de_Panam%C3%A1.jpg"],"cinta":["Adam Jones","CC BY-SA 2.0","https://commons.wikimedia.org/wiki/File:Along_the_Cinta_Costera_at_Nightfall_(05).jpg"],"cinta2":["123Hollic","CC BY-SA 4.0","https://commons.wikimedia.org/wiki/File:Cinta_Costera_Panam%C3%A1.jpg"],"skyline":["Dronepicr","CC BY 3.0","https://commons.wikimedia.org/wiki/File:Panama_City_2016.jpg"]};
+var ILL={club:1,bartender:1,monkey:1,sloth:1};
+
+/* ---------- theme ---------- */
+var root=document.documentElement,st=store.get('pty-theme');if(st)root.setAttribute('data-theme',st);
+$('#themeBtn').addEventListener('click',function(){var c=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');var n=c==='dark'?'light':'dark';root.setAttribute('data-theme',n);store.set('pty-theme',n);toast(n==='dark'?'🌙 Modo oscuro':'☀️ Modo claro')});
+
+/* ---------- modes ---------- */
+var M={walk:{ic:'🚶',n:'A pie',c:'var(--walk)'},metro:{ic:'🚇',n:'Metro',c:'var(--metro)'},bus:{ic:'🚌',n:'Bus',c:'var(--bus)'},uber:{ic:'🚕',n:'Uber',c:'var(--uber)'},tour:{ic:'🚙',n:'Tour',c:'var(--tour)'},plane:{ic:'✈️',n:'Traslado',c:'var(--plane)'}};
+
+/* ---------- places ---------- */
+var P={
+ riu:{n:'Riu Plaza Panamá',cat:'hotel',ll:[8.98111,-79.52102],ph:['riu'],d:'Su base, 5 noches. Piscina, desayuno incluido y la estación de Metro Iglesia del Carmen a 10 minutos a pie.',price:'Ya pagado',hrs:'Check-in 15:00 · check-out 12:00',w:0,how:[],q:'Riu Plaza Panama',web:'https://www.riu.com/es/hotel/panama/ciudad-de-panama/hotel-riu-plaza-panama/'},
+ casco:{n:'Casco Viejo',cat:'cultura',ll:[8.95247,-79.53474],ph:['casco','casco2','plazafrancia','sanjose'],d:'El barrio colonial, Patrimonio UNESCO: plazas, balcones con flores, el altar de oro de la Iglesia de San José y el atardecer en la Plaza de Francia. De noche es el corazón de la fiesta.',price:'Gratis',hrs:'Mejor al atardecer',w:0,how:[['walk','10′'],['metro','→ 5 de Mayo'],['walk','20′']],cost:'$0.35',tm:'≈ 40′',q:'Plaza de la Independencia Casco Viejo Panama',must:1},
+ miraflores:{n:'Esclusas de Miraflores',cat:'canal',ll:[8.99724,-79.59093],ph:['miraflores','miraflores2'],d:'Desde la terraza ven cómo los barcos gigantes suben y bajan en las esclusas del Canal. La entrada incluye la película IMAX. Revisen los tránsitos del día en la web.',price:'$17.22',hrs:'Todos los días 8:00–18:00',w:0,how:[['walk','10′'],['metro','→ Albrook'],['bus','Albrook–Miraflores']],cost:'$0.60',tm:'≈ 55′',q:'Centro de Visitantes de Miraflores',web:'https://visitcanaldepanama.com/es/miraflores/',ig:'canaldepanama',src:'ofi',must:1},
+ sanblas:{n:'San Blas (Guna Yala)',cat:'natu',ll:[9.45449,-78.97764],ph:['sanblas','sanblas2','sanblas3','sanblas4'],d:'Islas de arena blanca administradas por el pueblo guna. Sin nadar: lancha con chaleco, caminar por las islas, hamacas, almuerzo de pescado y el banco de arena con estrellas de mar, que se ven desde la lancha.',price:'≈ $100–150 por persona + tasa de $20–25',hrs:'Salida 5:00 · regreso ≈ 18:30',w:1,how:[['tour','4×4 desde el Riu']],cost:'En el tour',tm:'≈ 3 h',q:'Carti Guna Yala',src:'est',must:1},
+ panviejo:{n:'Panamá Viejo',cat:'cultura',ll:[9.00723,-79.48838],ph:['panviejo'],d:'Ruinas de la primera ciudad española en el Pacífico (1519). La entrada incluye el museo, la subida a la torre de la Catedral y el transporte interno.',price:'$17',hrs:'Mar–dom 8:30–17:30',w:0,how:[['walk','→ Vía Israel'],['bus','"Panamá Viejo"']],cost:'$0.25',tm:'≈ 30′',q:'Panama Viejo Centro de Visitantes',web:'https://www.patronatopanamaviejo.org/',ig:'sitioarqueologicopanamaviejo',src:'ofi',must:1},
+ biomuseo:{n:'Biomuseo',cat:'cultura',ll:[8.93193,-79.54477],ph:['biomuseo','biomuseo2'],d:'El edificio de colores de Frank Gehry sobre cómo el istmo cambió la biodiversidad del planeta.',price:'$20',hrs:'Mar–vie 9–15 · sáb–dom 10–15',w:0,how:[['walk','10′'],['metro','→ Albrook'],['bus','Amador–Albrook']],cost:'$0.60',tm:'≈ 45′',q:'Biomuseo Panama',web:'https://biomuseo.org/',ig:'biomuseo',src:'ofi'},
+ amador:{n:'Calzada de Amador',cat:'natu',ll:[8.91073,-79.52242],ph:['amador','amador2'],d:'Un camino sobre el mar que une tres islas a la entrada del Canal, con barcos en espera, el Puente de las Américas y el skyline. Alquilen una bici doble.',price:'Gratis',hrs:'Atardecer',w:0,how:[['metro','→ Albrook'],['bus','Amador–Albrook']],cost:'$0.60',tm:'≈ 45′',q:'Calzada de Amador'},
+ ancon:{n:'Cerro Ancón',cat:'natu',ll:[8.95765,-79.54920],ph:['ancon','sloth'],d:'Una colina selvática en plena ciudad, coronada por la bandera gigante. En la subida es común ver perezosos, ñeques y tucanes. Vayan temprano, antes del calor.',price:'Gratis',hrs:'6:30–8:30 ideal',w:0,how:[['uber','≈ 10′ temprano'],['metro','o → 5 de Mayo + 🚶20′']],cost:'≈ $5',tm:'≈ 15′',q:'Cerro Ancon Panama'},
+ gatun:{n:'Lago Gatún y Monkey Island',cat:'natu',ll:[9.1170,-79.6960],ph:['gatun','monkey'],d:'Paseo en lancha por el lago del Canal, entre portacontenedores gigantes e islas con monos capuchinos y aulladores. No hay que bajar al agua.',price:'≈ $70–220 por persona',hrs:'Medio día',w:1,how:[['tour','recojo en el hotel']],cost:'En el tour',tm:'≈ 45′',q:'Gamboa Panama',src:'est',must:1},
+ embera:{n:'Comunidad emberá',cat:'natu',ll:[9.2150,-79.5050],ph:['embera'],d:'Canoa por el río Chagres hasta una aldea emberá, con música, artesanía y almuerzo típico. Pidan chaleco y eviten la cascada si implica meterse al agua.',price:'≈ $45–170 por persona',hrs:'6–8 h',w:1,how:[['tour','recojo en el hotel']],cost:'En el tour',tm:'≈ 1.5 h',q:'Parque Nacional Chagres',src:'est'},
+ portobelo:{n:'Portobelo',cat:'cultura',ll:[9.5550,-79.6550],ph:['portobelo'],d:'Fuertes españoles frente al Caribe, Patrimonio UNESCO. Es el Plan B ideal si se cancela San Blas: todo en tierra.',price:'Bus ≈ $6',hrs:'Día completo',w:0,how:[['bus','Albrook → Sabanitas → Portobelo']],cost:'≈ $6',tm:'≈ 2.5 h',q:'Portobelo Panama'},
+ aguaclara:{n:'Esclusas de Agua Clara',cat:'canal',ll:[9.3010,-79.9230],ph:['aguaclara'],d:'Las esclusas nuevas del Canal, del lado del Atlántico, donde pasan los barcos neopanamax. Se puede combinar con Portobelo.',price:'$10',hrs:'Diario',w:0,how:[['bus','Albrook → Colón'],['uber','corto']],cost:'≈ $8',tm:'≈ 1.5 h',q:'Centro de Visitantes Agua Clara',src:'ofi'},
+ taboga:{n:'Isla Taboga',cat:'natu',ll:[8.7990,-79.5560],ph:['taboga','taboga2'],d:'La "isla de las flores": un pueblito de casas de colores a 45 minutos en ferry. Se disfruta caminando, sin meterse al agua.',price:'Ferry ≈ $20 ida y vuelta',hrs:'Según el ferry',w:2,how:[['metro','→ Albrook'],['bus','Amador'],['plane','ferry 45′']],cost:'≈ $21',tm:'≈ 2 h',q:'Isla Taboga',src:'ver'},
+ mercado:{n:'Mercado de Mariscos',cat:'comida',ll:[8.95830,-79.53899],ph:['mercado','mercado2'],d:'Ceviche de corvina en vasito desde ≈ $2.50 en la planta baja, y pescado frito arriba. Lleguen antes de las 13:00.',price:'≈ $3–10',hrs:'Mañana y mediodía',w:0,how:[['walk','10′'],['metro','→ 5 de Mayo'],['walk','8′']],cost:'$0.35',tm:'≈ 25′',q:'Mercado de Mariscos Panama',must:1},
+ cinta:{n:'Cinta Costera',cat:'natu',ll:[8.97532,-79.51717],ph:['cinta','cinta2'],d:'El malecón frente a la bahía y el skyline. Ideal para el atardecer, a pie desde el hotel.',price:'Gratis',hrs:'Atardecer',w:0,how:[['walk','15′']],cost:'Gratis',tm:'15′',q:'Cinta Costera Panama'},
+ maito:{n:'Maito',cat:'comida',ll:[8.99464,-79.49820],ph:[],emo:'💍',d:'#18 en Latin America\'s 50 Best 2025: cocina panameña contemporánea del chef Mario Castrellón. Es la cena de luna de miel, con menú degustación. Reserven con tiempo.',price:'$$$$',hrs:'Cena',w:0,how:[['uber','≈ 10′ (de noche)']],cost:'≈ $5',tm:'10′',q:'Maito restaurante Panama',ig:'maitopanama'},
+ fonda:{n:'Fonda Lo Que Hay',cat:'comida',ll:[8.9512,-79.5348],ph:[],emo:'🍲',d:'#82 en 50 Best: una fonda panameña llevada a lo gourmet, en el Casco Viejo. Prueben la panceta y el pollo frito. Reserven.',price:'$$',hrs:'Almuerzo y cena',w:0,how:[['metro','→ 5 de Mayo'],['walk','20′']],cost:'$0.35',tm:'≈ 40′',q:'Fonda Lo Que Hay Casco Viejo'},
+ metro:{n:'Metro · Iglesia del Carmen',cat:'metro',ll:[8.98231,-79.52723],ph:['metro','metro2'],d:'Su estación (Línea 1). Desde aquí: 3 paradas al Casco (5 de Mayo), 4 a Albrook y el ramal al aeropuerto vía San Miguelito.',price:'$0.35',hrs:'Lun–vie 5–23',w:0,how:[['walk','10′']],cost:'',tm:'10′',q:'Metro Iglesia del Carmen'},
+ albrook:{n:'Albrook: Metro, terminal y mall',cat:'metro',ll:[8.97252,-79.54967],ph:['metro2'],d:'La terminal de buses hacia Miraflores, Amador, Portobelo y Colón, junto al Albrook Mall.',price:'$0.35',hrs:'',w:0,how:[['metro','4 paradas']],cost:'$0.35',tm:'≈ 20′',q:'Albrook Mall'},
+ tocumen:{n:'Aeropuerto de Tocumen',cat:'metro',ll:[9.06813,-79.39367],ph:['tocumen','copa'],d:'Copa llega y sale por la Terminal 2. Koi los espera en la puerta P17. El lunes pueden volver en Metro.',price:'Metro $0.85',hrs:'',w:0,how:[['metro','L1 → San Miguelito'],['metro','L2 → Aeropuerto']],cost:'$0.85',tm:'≈ 70′',q:'Tocumen International Airport'}
+};
+var NIGHT={
+ tantalo:{n:'Tántalo rooftop',z:'Casco Viejo',ll:[8.95315,-79.53581],ph:['casconight'],g:['roof','house'],d:'La azotea con una de las mejores vistas del Casco, con DJ en la noche. Abre dom–mié de 15:00 a 2:00 y jue–sáb de 15:00 a 4:00 (según su web).',ig:'tantalohotel',q:'Tantalo Hotel Casco Viejo',web:'https://www.tantalohotel.com/',ret:'🚕 ≈ 15′'},
+ moloko:{n:'Moloko+',z:'Casco Viejo',ll:[8.9535,-79.5372],ph:['club'],g:['tech','lgbt'],d:'Bar y club underground con techno y house hasta las 4:00, LGBT+ friendly, en la Calle 12. Hay reportes de que podría haber cerrado: confirmen antes de ir.',q:'Moloko Plus Casco Viejo',ret:'🚕 ≈ 15′'},
+ jaguar:{n:'Casa Jaguar',z:'Casco Viejo',ll:[8.9520,-79.5355],ph:['casconight'],g:['house','latin'],d:'Gastropub que se vuelve fiesta: patio con electrónica y salón con música latina.',q:'Casa Jaguar Casco Viejo Panama',ret:'🚕 ≈ 15′'},
+ teatro:{n:'Teatro Amador',z:'Casco Viejo',ll:[8.95342,-79.53800],ph:['club'],g:['house','latin'],d:'Antiguo teatro convertido en discoteca. Ha traído DJs internacionales de tech house, aunque el público es joven y suena reggaetón.',q:'Teatro Amador Casco Viejo',ret:'🚕 ≈ 15′'},
+ strangers:{n:'The Strangers Club',z:'Casco Viejo',ll:[8.9525,-79.5345],ph:['bartender'],g:['cock'],d:'Coctelería de autor creada en 2017 por bartenders de varios países. La previa perfecta.',q:'The Strangers Club Casco Viejo',ret:'🚕 ≈ 15′'},
+ mandinga:{n:'Pedro Mandinga Rum Bar',z:'Casco Viejo + Vía Argentina',ll:[8.9522,-79.5370],ph:['bartender'],g:['cock'],d:'La primera destilería artesanal de ron de Panamá. Happy hour de 12:00 a 18:00 y degustación si la piden. Tiene otro local en Vía Argentina, cerca del Riu.',ig:'pedromandinga',q:'Pedro Mandinga Rum Bar',ret:'🚕 / 🚶'},
+ cangrejo:{n:'El Cangrejo Radio',z:'El Cangrejo',ll:[8.98928,-79.52674],ph:['skynight'],g:['house'],d:'Bar de barrio con DJs de electrónica que transmite sus noches en vivo. Abre de martes a domingo.',ig:'elcangrejoradio',q:'El Cangrejo Radio Panama',ret:'🚶 15′ del Riu'},
+ bier:{n:'BierGarten',z:'El Cangrejo',ll:[8.98644,-79.52573],ph:['club'],g:['house','tech'],d:'Fiestas electrónicas semanales con temática de selva.',ig:'biergartenpanama',q:'BierGarten El Cangrejo Panama',ret:'🚶 12′ del Riu'},
+ uruguay:{n:'Calle Uruguay (Privé, Alta Bar)',z:'Bella Vista',ll:[8.97792,-79.52544],ph:['skynight'],g:['latin','house'],d:'La calle de las discotecas: Privé (reggaetón, hip hop y electrónica, mar–sáb 21–3) y Alta Bar (jue–sáb 21–3).',q:'Calle Uruguay Panama',ret:'🚶 10′ del Riu'},
+ dorado:{n:'Teatro El Dorado',z:'Ciudad de Panamá',ll:null,ph:['club'],g:['tech','house'],d:'Espacio al aire libre en un antiguo teatro, con fiestas mayormente electrónicas. Revisen su Instagram para las fechas.',ig:'teatroeldoradopanama',q:'Teatro El Dorado Panama',ret:'🚕'}
+};
+var GN={tech:['g-tech','Techno'],house:['g-house','Electrónica'],roof:['g-roof','Rooftop'],cock:['g-cock','Cocteles'],latin:['g-latin','Latino'],lgbt:['g-lgbt','LGBT+']};
+
+/* ---------- instagram stories ---------- */
+var IG_HOME=[
+ {h:'visitpanama',n:'Visit Panamá',ph:'skyline',ok:1,k:'Turismo oficial',why:['Fotos y novedades de destinos','Eventos de noviembre y fiestas patrias','Ideas para guardar antes de ir'],when:'Síganla desde ya.'},
+ {h:'canaldepanama',n:'Canal de Panamá',ph:'miraflores',ok:1,k:'Oficial · ACP',why:['Avisos del Centro de Visitantes de Miraflores (hay obras hasta fines de 2026)','Barcos y tránsitos destacados'],when:'Revísenla el miércoles 25 en la noche, antes de ir el jueves.'},
+ {h:'imhpapma',n:'IMHPA · Clima',ph:'cinta2',ok:1,k:'Oficial · meteorología',why:['Alertas de lluvia y tormentas','Estado del mar: clave para la lancha a San Blas'],when:'Jueves 26 en la noche: revisen el mar para el viernes.'},
+ {h:'ElMetroDePanama',n:'Metro de Panamá',ph:'metro',ok:1,k:'Oficial',why:['Cierres de estaciones y horarios especiales','Cambios por el feriado del 28'],when:'Antes de moverse el sábado 28 y el lunes 30 (aeropuerto).'},
+ {h:'biomuseo',n:'Biomuseo',ph:'biomuseo',ok:1,k:'Oficial',why:['Exposiciones y actividades de la semana'],when:'Antes del jueves 26.'},
+ {h:'sitioarqueologicopanamaviejo',n:'Panamá Viejo',ph:'panviejo',ok:1,k:'Oficial · Patronato',why:['Horarios, recorridos guiados y eventos en las ruinas'],when:'Antes del domingo 29.'},
+ {h:'maitopanama',n:'Maito',ph:null,emo:'💍',ok:0,k:'Su cena de luna de miel',why:['Menú degustación y novedades del chef Mario Castrellón','Para reservar o escribirles'],when:'Reserven con 2 a 3 semanas de anticipación.'},
+ {h:'tantalohotel',n:'Tántalo',ph:'casconight',ok:1,k:'Rooftop · Casco',why:['DJs y fiestas en la azotea','Eventos especiales del fin de semana'],when:'Revísenla el sábado 28 en la tarde.'},
+ {h:'pedromandinga',n:'Pedro Mandinga',ph:'bartender',ok:0,k:'Bar de ron',why:['Happy hour y catas de ron','Su local de Vía Argentina, cerca del Riu'],when:'Para cualquier tarde libre.'}
+];
+var IG_NIGHT=[
+ {h:'elcangrejoradio',n:'El Cangrejo Radio',ph:'skynight',ok:0,k:'Bar electrónico',why:['Line-up de DJs por noche','Transmisiones en vivo'],when:'Queda a 15 minutos a pie del Riu: ideal para el jueves 26 o el viernes 27.'},
+ {h:'biergartenpanama',n:'BierGarten',ph:'club',ok:0,k:'Fiestas semanales',why:['Fiestas electrónicas con temática de selva'],when:'Revisen qué día les toca.'},
+ {h:'technoydopamina',n:'Techno y Dopamina',ph:'club',ok:0,k:'Colectivo techno',why:['Raves y fiestas techno'],when:'Hacia el 20 de noviembre, para ver el fin de semana del 27–28.'},
+ {h:'latenight_music',n:'Late Night Music',ph:'amador2',ok:0,k:'Promotora',why:['Fiestas electro en Isla Flamenco y en yates'],when:'Hacia el 20 de noviembre.'},
+ {h:'toutvabien.nights',n:'Tout Va Bien',ph:'casconight',ok:0,k:'Colectivo',why:['Fiestas house y disco'],when:'Hacia el 20 de noviembre.'},
+ {h:'booth.panama',n:'Booth Panamá',ph:'club',ok:0,k:'DJ sets',why:['Sets y fiestas underground'],when:'Hacia el 20 de noviembre.'},
+ {h:'aftermood.pa',n:'Aftermood',ph:'skynight',ok:0,k:'Afters',why:['After-parties'],when:'Para el sábado 28.'},
+ {h:'boilerconcept.pa',n:'Boiler Concept',ph:'club',ok:0,k:'Formato Boiler Room',why:['Sesiones tipo Boiler Room'],when:'Hacia el 20 de noviembre.'},
+ {h:'levelclubpanama',n:'Level Club',ph:'club',ok:0,k:'Club',why:['Agenda de DJs'],when:'Hacia el 20 de noviembre.'},
+ {h:'electronicapanama',n:'Electrónica Panamá',ph:'skynight',ok:0,k:'Agenda de la escena',why:['Reúne los eventos electrónicos del país'],when:'Su mejor fuente de fiestas.'},
+ {h:'teatroeldoradopanama',n:'Teatro El Dorado',ph:'club',ok:0,k:'Venue al aire libre',why:['Fiestas electrónicas en un antiguo teatro'],when:'Revisen la fecha del 27–28.'},
+ {h:'buenavainaclub',n:'Buena Vaina',ph:'casconight',ok:0,k:'Venue al aire libre',why:['Noches de distintos géneros'],when:'Hacia el 20 de noviembre.'},
+ {h:'panamacrossroads',n:'Panama Crossroads',ph:'amador2',ok:0,k:'Festival electrónico',why:['Festival de 3 días (suele ser en febrero)','Fiestas previas durante el año'],when:'Por si anuncian algo en noviembre.'},
+ {h:'tribalgatheringpanama',n:'Tribal Gathering',ph:'sanblas3',ok:0,k:'Festival · marzo 2027',why:['El festival más grande, en la costa de Colón','A veces arman eventos previos'],when:'No coincide con su viaje, pero vale la pena seguirlo.'}
+];
+
+/* ---------- itinerary ---------- */
+function G(m,t,c){return {m:m,t:t,c:c||''}}
+var DAYS=[
+ {date:'2026-11-25',d:'Mié 25',t:'Llegada',ph:'casco',title:'Llegada y primer atardecer',stops:[
+  {t:'04:00',b:'Aeropuerto Jorge Chávez',n:'3 h antes del vuelo de las 07:00',e:'🛫'},
+  {leg:G('plane','Copa CM 462 · 3 h 39 min')},
+  {t:'10:39',b:'Tocumen, Terminal 2',n:'Koi los espera en la puerta P17',p:'tocumen'},
+  {leg:G('plane','Traslado Koi · ≈ 35–45′','pagado')},
+  {t:'12:00',b:'Riu Plaza: dejar maletas',n:'Check-in 15:00 · pidan early check-in',p:'riu'},
+  {t:'12:30',b:'Almuerzo cerca del hotel',n:'Calle 50, Marbella, Vía Argentina',e:'🍽️'},
+  {t:'15:00',b:'Check-in, siesta y piscina',n:'Se levantaron a las 3 de la mañana',e:'😴'},
+  {leg:G('metro','🚶10′ → Iglesia del Carmen → 5 de Mayo → 🚶20′','$0.35')},
+  {t:'17:00',b:'Casco Viejo al atardecer',n:'Catedral → San José → Plaza de Francia',p:'casco'},
+  {t:'19:30',b:'Cena: Fonda Lo Que Hay',n:'#82 en 50 Best · reserven',p:'fonda'},
+  {t:'21:00',b:'Brindis en el rooftop de Tántalo',n:'Primer brindis 🥂',p:'tantalo',night:1},
+  {leg:G('uber','De noche, en app · ≈ 15′','≈ $6–10')},
+  {t:'23:00',b:'De vuelta en el Riu',e:'🏨'}
+ ]},
+ {date:'2026-11-26',d:'Jue 26',t:'Canal',ph:'miraflores',title:'Canal de Panamá y cena de luna de miel',stops:[
+  {t:'07:00',b:'Desayuno (incluido)',n:'Revisen los tránsitos del día en la web del Canal',e:'🥐'},
+  {leg:G('metro','🚶10′ → Iglesia del Carmen → Albrook (4 paradas)','$0.35')},
+  {leg:G('bus','Bus "Albrook–Miraflores" · si tarda: 🚕 ≈ 15′','$0.25')},
+  {t:'08:15',b:'Esclusas de Miraflores',n:'$17.22 · terraza + IMAX',p:'miraflores'},
+  {leg:G('uber','No hay conexión directa · ≈ 20′','≈ $8–12')},
+  {t:'10:30',b:'Biomuseo',n:'$20 · cierra a las 15:00',p:'biomuseo'},
+  {t:'12:30',b:'Almuerzo en la Calzada de Amador',n:'Barcos y skyline',p:'amador'},
+  {leg:G('bus','Bus "Amador–Albrook" + 🚇 a Iglesia del Carmen','≈ $0.60')},
+  {t:'14:30',b:'Piscina del Riu',n:'Hora típica del aguacero 🌧️',e:'🏊'},
+  {leg:G('walk','15′')},
+  {t:'17:30',b:'Atardecer en la Cinta Costera',p:'cinta'},
+  {leg:G('uber','≈ 10′ (de noche)','≈ $4–6')},
+  {t:'20:00',b:'Cena de luna de miel: Maito',n:'#18 en 50 Best',p:'maito',night:1},
+  {t:'22:30',b:'Opcional: El Cangrejo Radio',n:'DJs de electrónica · a 15′ a pie del Riu',p:'cangrejo',night:1}
+ ]},
+ {date:'2026-11-27',d:'Vie 27',t:'San Blas',ph:'sanblas',title:'San Blas por el día (sin nadar)',stops:[
+  {t:'05:00',b:'Recojo en el Riu (4×4)',n:'Pidan el desayuno para llevar la noche anterior',e:'🚙'},
+  {leg:G('tour','≈ 2.5–3 h por la carretera El Llano–Cartí')},
+  {t:'07:30',b:'Control de la comarca guna',n:'$20–25 por persona en efectivo + pasaporte original',e:'🛂'},
+  {leg:G('tour','🛶 Lancha de 25–45′ · chaleco puesto')},
+  {t:'09:00',b:'Recorrido por 3 o 4 islas',n:'Caminar, hamacas, fotos y almuerzo. Sin nadar.',p:'sanblas'},
+  {t:'12:00',b:'Banco de arena con estrellas de mar',n:'Se ven desde la lancha. Bajar es opcional (agua baja).',ph:'sanblas3',p:'sanblas'},
+  {leg:G('tour','Lancha + 4×4 de regreso')},
+  {t:'18:30',b:'De vuelta en el Riu',e:'🏨'},
+  {leg:G('walk','10′')},
+  {t:'22:00',b:'Opcional: Calle Uruguay',n:'Es viernes: discotecas a 10′ del hotel',p:'uruguay',night:1}
+ ]},
+ {date:'2026-11-28',d:'Sáb 28',t:'Selva + fiesta',ph:'monkey',title:'Monos, feriado patrio y gran noche',stops:[
+  {t:'07:00',b:'Desayuno',e:'🥐'},
+  {leg:G('tour','Recojo en el hotel')},
+  {t:'08:00',b:'Lago Gatún y Monkey Island',n:'En lancha con chaleco. Confirmen que opera en feriado.',p:'gatun'},
+  {leg:G('tour','De regreso')},
+  {t:'13:30',b:'Almuerzo, piscina y masaje',n:'Recarguen energía para la noche',e:'💆'},
+  {leg:G('metro','🚶 → Iglesia del Carmen → 5 de Mayo → 🚶20′ · el Metro cierra a las 22:00','$0.35')},
+  {t:'19:30',b:'Cena patria en el Casco',n:'Banderas y ambiente festivo',p:'casco',night:1},
+  {t:'22:00',b:'The Strangers Club',n:'Coctelería de autor',p:'strangers',night:1},
+  {t:'23:30',b:'Tántalo rooftop',n:'DJ al aire libre (sáb hasta las 4:00)',p:'tantalo',night:1},
+  {t:'01:00',b:'Casa Jaguar o Moloko+',n:'Electrónica hasta tarde',p:'jaguar',night:1},
+  {leg:G('uber','En app desde la puerta · ≈ 15′','≈ $6–10')},
+  {t:'03:00',b:'Riu',e:'🏨'}
+ ]},
+ {date:'2026-11-29',d:'Dom 29',t:'Historia',ph:'panviejo',title:'Panamá Viejo, compras y despedida',stops:[
+  {t:'09:30',b:'Desayuno tarde (después de la fiesta)',e:'🥐'},
+  {leg:G('bus','Bus por la Vía Israel, cartel "Panamá Viejo" · o 🚕 ≈ 15′','$0.25')},
+  {t:'10:30',b:'Panamá Viejo',n:'$17 · torre de la Catedral · el lunes cierra',p:'panviejo'},
+  {leg:G('bus','Mismo bus de regreso')},
+  {t:'13:00',b:'Multiplaza o Soho Mall + almuerzo',n:'Ojo: solo llevan equipaje de mano',e:'🛍️'},
+  {t:'15:00',b:'Siesta y piscina',e:'😴'},
+  {leg:G('metro','🚶 → Iglesia del Carmen → 5 de Mayo → 🚶20′','$0.35')},
+  {t:'17:30',b:'Último atardecer en el Casco',n:'Paseo Esteban Huertas',p:'casco'},
+  {t:'19:30',b:'Cena de despedida en un rooftop',p:'tantalo',night:1},
+  {leg:G('uber','≈ 15′','≈ $6–10')},
+  {t:'22:30',b:'Riu',e:'🏨'}
+ ]},
+ {date:'2026-11-30',d:'Lun 30',t:'Regreso',ph:'mercado',title:'Última mañana y vuelo a Lima',stops:[
+  {leg:G('uber','Opcional, muy temprano · ≈ 10′','≈ $5')},
+  {t:'06:30',b:'Cerro Ancón (opcional)',n:'Perezosos y la mejor vista',p:'ancon'},
+  {t:'08:30',b:'Desayuno y maletas listas',e:'🥐'},
+  {leg:G('metro','🚶 → Iglesia del Carmen → 5 de Mayo → 🚶8′','$0.35')},
+  {t:'11:30',b:'Último ceviche',n:'En vasito, desde $2.50',p:'mercado'},
+  {leg:G('metro','5 de Mayo → Iglesia del Carmen','$0.35')},
+  {t:'12:30',b:'Check-out o late check-out',n:'Si no hay late check-out, la maleta queda en el guardaequipaje',p:'riu'},
+  {leg:G('metro','L1 → San Miguelito → L2 → Corredor Sur → ramal → Aeropuerto · ≈ 70′','$0.85')},
+  {t:'15:00',b:'Salir hacia Tocumen',n:'Lleguen a las 16:00',p:'tocumen'},
+  {leg:G('plane','Copa CM 489 · 18:59 → 22:45')},
+  {t:'22:45',b:'Lima 💍',e:'🏠'}
+ ]}
+];
+
+/* ---------- utils ---------- */
+function getP(id){return P[id]||NIGHT[id]}
+function phOf(o,i){return o&&o.ph&&o.ph.length?o.ph[i||0]:null}
+function credTxt(id){var c=CRED[id];return c?('📷 '+c[0]+' · '+c[1]+(ILL[id]?' · ilustrativa':'')):''}
+function gdir(ll,q){return 'https://www.google.com/maps/dir/?api=1&destination='+(ll?ll[0]+','+ll[1]:encodeURIComponent(q))+'&travelmode=transit'}
+function gsearch(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)}
+var PH_COL=[['#e2365b','#7b5cff'],['#0e8a8c','#0b5fa5'],['#b26f12','#e2365b']];
+
+/* ---------- today ---------- */
+function panamaToday(){try{return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Panama',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}catch(e){return new Date().toISOString().slice(0,10)}}
+var today=panamaToday(),todayIdx=DAYS.findIndex(function(d){return d.date===today});
+
+/* ---------- router ---------- */
+var VIEWS=['inicio','plan','mapa','noche','mas'],cur=null;
+function go(v,push){
+  if(VIEWS.indexOf(v)<0)v='inicio';
+  if(v===cur)return;cur=v;
+  $$('.view').forEach(function(s){s.classList.toggle('on',s.dataset.view===v)});
+  $$('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.go===v)});
+  document.querySelector('meta[name=theme-color]').setAttribute('content',v==='noche'?'#0b0a16':'#0b1220');
+  window.scrollTo(0,0);
+  if(push!==false)history.replaceState(null,'','#'+v);
+  if(v==='mapa')initMap();
+}
+$$('.tab').forEach(function(t){t.addEventListener('click',function(){buzz();go(t.dataset.go)})});
+window.addEventListener('hashchange',function(){go(location.hash.slice(1),false)});
+
+/* ---------- hero slideshow ---------- */
+var HERO=['casco','sanblas','miraflores','skyline'];
+var hero=$('#hero'),hi=0;
+HERO.slice().reverse().forEach(function(id,ri){var i=HERO.length-1-ri;var s=document.createElement('div');s.className='slide'+(i===0?' on':'');s.innerHTML='<img src="'+img(id)+'" alt="" '+(i?'loading="lazy"':'fetchpriority="high"')+'>';hero.insertBefore(s,hero.firstChild)});
+var slides=$$('.slide',hero);
+$('#heroDots').innerHTML=HERO.map(function(_,i){return '<i class="'+(i===0?'on':'')+'"></i>'}).join('');
+function heroCap(){$('#heroCap').textContent=credTxt(HERO[hi])}
+heroCap();
+setInterval(function(){if(cur!=='inicio'||document.hidden)return;slides[hi].classList.remove('on');hi=(hi+1)%HERO.length;slides[hi].classList.add('on');$$('#heroDots i').forEach(function(d,i){d.classList.toggle('on',i===hi)});heroCap()},5500);
+
+/* countdown */
+function countdown(){
+  var now=new Date(),start=new Date('2026-11-25T07:00:00-05:00'),end=new Date('2026-11-30T23:59:00-05:00'),ms=start-now,el=$('#countdown');
+  if(ms>0){var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);el.innerHTML='⏳ Faltan <b>'+d+'</b> días '+h+' h'}
+  else if(now<=end){el.innerHTML='💍 Día <b>'+(todayIdx+1)+'</b> de 6 · ¡a disfrutar!'}
+  else el.innerHTML='💍 Viaje realizado';
+}
+countdown();setInterval(countdown,60000);
+
+/* ---------- stories ---------- */
+var seen={};try{seen=JSON.parse(store.get('pty-seen')||'{}')}catch(e){}
+function storyRow(list,el){
+  el.innerHTML=list.map(function(s,i){return '<button class="story" data-i="'+i+'"><div class="ring'+(seen[s.h]?' seen':'')+'"><div class="av">'+(s.ph?'<img src="'+img(s.ph)+'" alt="" loading="lazy">':(s.emo||'📷'))+'</div></div><b>@'+esc(s.h)+'</b></button>'}).join('');
+  $$('.story',el).forEach(function(b){b.addEventListener('click',function(){openStories(list,+b.dataset.i,el)})});
+}
+storyRow(IG_HOME,$('#storiesHome'));storyRow(IG_NIGHT,$('#storiesNight'));
+
+var SV={list:null,i:0,start:0,dur:6500,paused:false,row:null,raf:0};
+function openStories(list,i,row){SV.list=list;SV.i=i;SV.row=row;$('#sv').classList.add('on');document.body.style.overflow='hidden';renderStory()}
+function closeStories(){cancelAnimationFrame(SV.raf);$('#sv').classList.remove('on');document.body.style.overflow='';storyRow(SV.list,SV.row)}
+function renderStory(){
+  var s=SV.list[SV.i];seen[s.h]=1;store.set('pty-seen',JSON.stringify(seen));
+  var st=$('#svStage');
+  st.innerHTML='<div class="bg">'+(s.ph?'<img src="'+img(s.ph)+'" alt="">':'<div style="position:absolute;inset:0;background:linear-gradient(135deg,#e2365b,#7b5cff)"></div>')+'</div>'+
+   '<div class="bars">'+SV.list.map(function(_,k){return '<i><span style="width:'+(k<SV.i?100:0)+'%"></span></i>'}).join('')+'</div>'+
+   '<div class="hd"><div class="av">'+(s.ph?'<img src="'+img(s.ph)+'" alt="">':'<div style="width:100%;height:100%;display:grid;place-items:center;background:#e2365b">'+(s.emo||'📷')+'</div>')+'</div><div><b>@'+esc(s.h)+'</b><small>'+esc(s.n)+'</small></div><button class="x" aria-label="Cerrar">✕</button></div>'+
+   '<div class="tapL"></div><div class="tapR"></div>'+
+   '<div class="body"><span class="k">'+esc(s.k)+'</span><h3>'+esc(s.n)+'</h3><ul>'+s.why.map(function(w){return '<li>'+esc(w)+'</li>'}).join('')+'</ul><div class="when">🗓️ '+esc(s.when)+'</div><div class="ver">'+(s.ok?'✅ Cuenta enlazada desde su web oficial':'⚠️ Cuenta tomada de una guía local: verifiquen que sea la correcta')+'</div></div>'+
+   '<a class="cta" href="https://www.instagram.com/'+encodeURIComponent(s.h)+'/" target="_blank" rel="noopener">Abrir @'+esc(s.h)+' en Instagram ↗</a>';
+  $('.x',st).addEventListener('click',closeStories);
+  $('.tapL',st).addEventListener('click',function(){step(-1)});
+  $('.tapR',st).addEventListener('click',function(){step(1)});
+  [$('.tapL',st),$('.tapR',st)].forEach(function(z){z.addEventListener('pointerdown',function(){SV.paused=true;SV.pauseAt=Date.now()});z.addEventListener('pointerup',function(){if(SV.paused){SV.start+=Date.now()-SV.pauseAt;SV.paused=false}});z.addEventListener('pointerleave',function(){if(SV.paused){SV.start+=Date.now()-SV.pauseAt;SV.paused=false}})});
+  SV.start=Date.now();var bar=$$('.bars i span',st)[SV.i];
+  cancelAnimationFrame(SV.raf);
+  (function tick(){if(!SV.paused){var p=(Date.now()-SV.start)/SV.dur;bar.style.width=Math.min(100,p*100)+'%';if(p>=1){step(1);return}}SV.raf=requestAnimationFrame(tick)})();
+}
+function step(d){var n=SV.i+d;if(n<0)n=0;if(n>=SV.list.length){closeStories();return}SV.i=n;renderStory()}
+document.addEventListener('keydown',function(e){if($('#sv').classList.contains('on')){if(e.key==='Escape')closeStories();if(e.key==='ArrowRight')step(1);if(e.key==='ArrowLeft')step(-1)}else if(e.key==='Escape')closeSheet()});
+(function(){var y0=null;var sv=$('#sv');sv.addEventListener('touchstart',function(e){y0=e.touches[0].clientY},{passive:true});sv.addEventListener('touchend',function(e){if(y0!=null&&e.changedTouches[0].clientY-y0>90)closeStories();y0=null})})();
+
+/* ---------- sheet ---------- */
+function openSheet(id){
+  var o=getP(id);if(!o)return;buzz();
+  var phs=(o.ph||[]),isNight=!!NIGHT[id];
+  var gal=phs.length?'<div class="gal" id="gal">'+phs.map(function(p){var tag=ILL[p]?'Foto ilustrativa':(isNight&&p!=='casconight'?'Foto ilustrativa':(isNight?'La zona de noche':''));return '<figure><img src="'+img(p)+'" alt="'+esc(o.n)+'">'+(tag?'<span class="ill">'+tag+'</span>':'')+'<figcaption>'+esc(credTxt(p))+'</figcaption></figure>'}).join('')+'</div>'+(phs.length>1?'<div class="gdots" id="gdots">'+phs.map(function(_,i){return '<i class="'+(i?'':'on')+'"></i>'}).join('')+'</div>':'')
+   :'<div class="ph-big">'+(o.emo||'📍')+'</div>';
+  var w=[['w0','✅ Sin agua'],['w1','🛶 Bote con chaleco'],['w2','🦶 Agua opcional']][o.w||0];
+  var kv=isNight?('<span>📍 '+esc(o.z)+'</span><span>Vuelta: '+esc(o.ret)+'</span>'+o.g.map(function(g){return '<span class="gt '+GN[g][0]+'">'+GN[g][1]+'</span>'}).join(''))
+   :((o.price?'<span>💵 '+esc(o.price)+'</span>':'')+(o.hrs?'<span>🕐 '+esc(o.hrs)+'</span>':'')+'<span class="'+w[0]+'">'+w[1]+'</span>'+(o.src==='est'?'<span>Precio estimado</span>':o.src==='ver'?'<span>Verificar</span>':o.src==='ofi'?'<span>✓ Dato oficial</span>':''));
+  var how=o.how&&o.how.length?'<div class="howbox"><b>Desde el Riu</b><div class="chain">'+o.how.map(function(x){var m=M[x[0]];return '<span class="s" style="--c:'+m.c+'">'+m.ic+' '+esc(x[1])+'</span>'}).join('')+'</div>'+(o.tm?'<div class="small muted" style="margin-top:4px">⏱ '+esc(o.tm)+(o.cost?' · 💵 '+esc(o.cost):'')+'</div>':'')+'</div>':'';
+  var acts='<a class="abtn pri" href="'+gdir(o.ll,o.q)+'" target="_blank" rel="noopener">🧭 Cómo llegar</a><a class="abtn" href="'+gsearch(o.q||o.n)+'" target="_blank" rel="noopener">📍 Google Maps</a>'+(o.ig?'<a class="abtn ig" href="https://www.instagram.com/'+o.ig+'/" target="_blank" rel="noopener">📸 @'+esc(o.ig)+'</a>':'')+(o.web?'<a class="abtn" href="'+o.web+'" target="_blank" rel="noopener">🌐 Web oficial</a>':'');
+  $('#sheetBody').innerHTML=gal+'<div class="cnt"><h3>'+esc(o.n)+'</h3><div class="kv">'+kv+'</div><p>'+esc(o.d)+'</p>'+how+'<div class="acts">'+acts+'</div></div>';
+  $('#sheetBody').scrollTop=0;
+  var g=$('#gal');if(g&&$('#gdots')){g.addEventListener('scroll',function(){var i=Math.round(g.scrollLeft/g.clientWidth);$$('#gdots i').forEach(function(d,k){d.classList.toggle('on',k===i)})},{passive:true})}
+  $('#scrim').classList.add('on');$('#sheet').classList.add('on');document.body.style.overflow='hidden';
+}
+function closeSheet(){$('#scrim').classList.remove('on');var s=$('#sheet');s.classList.remove('on');s.style.transform='';document.body.style.overflow=''}
+$('#scrim').addEventListener('click',closeSheet);$('#sheetClose').addEventListener('click',closeSheet);
+(function(){var s=$('#sheet'),y0=null,dy=0;s.addEventListener('touchstart',function(e){if($('#sheetBody').scrollTop>0||e.target.closest('.gal'))return;y0=e.touches[0].clientY;s.style.transition='none'},{passive:true});
+ s.addEventListener('touchmove',function(e){if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);s.style.transform='translate(-50%,'+dy+'px)'},{passive:true});
+ s.addEventListener('touchend',function(){if(y0==null)return;s.style.transition='';if(dy>110)closeSheet();else s.style.transform='';y0=null;dy=0})})();
+document.addEventListener('click',function(e){var t=e.target.closest('[data-p]');if(t){e.preventDefault();openSheet(t.dataset.p)}});
+
+/* ---------- home: today card ---------- */
+(function(){
+  var i=todayIdx>=0?todayIdx:0,d=DAYS[i];
+  $('#todayCard').innerHTML='<img src="'+img(d.ph)+'" alt="" loading="lazy"><div><div class="k">'+(todayIdx>=0?'Hoy · '+d.d:'Su primer día · '+d.d)+'</div><h4>'+esc(d.title)+'</h4><div class="small muted">'+d.stops.filter(function(s){return !s.leg}).length+' paradas · toquen para ver el plan →</div></div>';
+  $('#todayCard').addEventListener('click',function(){go('plan');showDay(i)});
+})();
+
+/* must rail */
+$('#mustRail').innerHTML=Object.keys(P).filter(function(k){return P[k].must}).map(function(k){var o=P[k],w=[['ok','✅ Sin agua'],['sea','🛶 Con chaleco'],['warn','🦶 Opcional']][o.w||0];
+  return '<button class="pcard" data-p="'+k+'"><img src="'+img(o.ph[0])+'" alt="'+esc(o.n)+'" loading="lazy"><div class="tl"><span class="badge '+w[0]+'">'+w[1]+'</span></div><div class="in"><span class="badge">💵 '+esc(o.price)+'</span><h4>'+esc(o.n)+'</h4><p>'+esc(o.hrs)+'</p></div></button>'}).join('');
+
+/* explore */
+var CATS=[['all','Todo'],['canal','🚢 Canal'],['cultura','🏛️ Cultura'],['natu','🌿 Naturaleza'],['comida','🍽️ Comida'],['seco','✅ Sin agua']];
+var curCat='all';
+$('#exploreChips').innerHTML=CATS.map(function(c){return '<button class="chip'+(c[0]==='all'?' on':'')+'" data-c="'+c[0]+'">'+c[1]+'</button>'}).join('');
+$$('#exploreChips .chip').forEach(function(b){b.addEventListener('click',function(){curCat=b.dataset.c;$$('#exploreChips .chip').forEach(function(x){x.classList.toggle('on',x===b)});renderExplore()})});
+function renderExplore(){
+  var ks=Object.keys(P).filter(function(k){var o=P[k];if(o.cat==='hotel'||o.cat==='metro')return false;return curCat==='all'||(curCat==='seco'?!o.w:o.cat===curCat)});
+  $('#exploreCount').textContent=ks.length+' lugares';
+  $('#exploreGrid').innerHTML=ks.map(function(k,i){var o=P[k],c=PH_COL[i%3];return o.ph.length?'<button class="tile" data-p="'+k+'"><img src="'+img(o.ph[0])+'" alt="'+esc(o.n)+'" loading="lazy">'+(o.w?'':'<span class="tl"><span class="badge ok">✅</span></span>')+'<div class="in"><b>'+esc(o.n)+'</b><span>'+esc(o.price)+'</span></div></button>'
+   :'<button class="tile ph" style="--c1:'+c[0]+';--c2:'+c[1]+'" data-p="'+k+'"><span class="emo">'+(o.emo||'📍')+'</span><div class="in"><b>'+esc(o.n)+'</b><span>'+esc(o.price)+'</span></div></button>'}).join('');
+}
+renderExplore();
+
+/* ---------- plan ---------- */
+var curDay=todayIdx>=0?todayIdx:0;
+$('#dayChips').innerHTML=DAYS.map(function(d,i){return '<button class="dchip" data-i="'+i+'"><small>'+d.d+(d.date===today?'<span class="hoy">HOY</span>':'')+'</small><b>'+d.t+'</b></button>'}).join('');
+$$('.dchip').forEach(function(b){b.addEventListener('click',function(){buzz();showDay(+b.dataset.i)})});
+function showDay(i){
+  curDay=i;var d=DAYS[i];
+  $$('.dchip').forEach(function(b,k){b.classList.toggle('on',k===i)});
+  var on=$$('.dchip')[i],dc=$('#dayChips');if(on&&dc)dc.scrollTo({left:on.offsetLeft-dc.clientWidth/2+on.clientWidth/2,behavior:'smooth'});
+  $('#planSub').textContent=(i+1)+' de 6';
+  var counts={};d.stops.forEach(function(s){if(s.leg)counts[s.leg.m]=(counts[s.leg.m]||0)+1});
+  var n=0,h='<div class="dayhero"><img src="'+img(d.ph)+'" alt=""><div class="in"><div class="small" style="opacity:.85;font-weight:700">'+d.d+' de noviembre</div><h3>'+esc(d.title)+'</h3><div class="modes">'+Object.keys(counts).map(function(k){return '<span>'+M[k].ic+' ×'+counts[k]+'</span>'}).join('')+'</div></div></div><div class="swipehint">← desliza para cambiar de día →</div><ol class="stops">';
+  d.stops.forEach(function(s){
+    if(s.leg){var m=M[s.leg.m];h+='<li class="leg" style="--c:'+m.c+'"><div class="l"></div><div class="lt"><span class="mchip">'+m.ic+' '+m.n+'</span><span class="tx">'+esc(s.leg.t)+'</span>'+(s.leg.c?'<b>'+esc(s.leg.c)+'</b>':'')+'</div></li>';return}
+    n++;var o=s.p?getP(s.p):null,pid=s.ph||phOf(o);
+    var th=pid?'<img src="'+img(pid)+'" alt="" loading="lazy">':'<span class="ph2">'+(s.e||(o&&o.emo)||'📍')+'</span>';
+    h+='<li class="stop'+(s.night?' night':'')+'"><div class="num"><i>'+n+'</i></div><button class="box'+(o?' link':'')+'"'+(o?' data-p="'+s.p+'"':'')+'><div><div class="t">'+s.t+'</div><b>'+esc(s.b)+'</b>'+(s.n?'<div class="n">'+esc(s.n)+'</div>':'')+'</div>'+th+'</button></li>';
+  });
+  h+='</ol>';
+  if(d.date==='2026-11-27')h+='<div class="note tip"><span class="e">🏊‍♂️</span><div><b>Sin saber nadar:</b> todo es en lancha (chaleco puesto) y caminando por las islas. Si el mar está picado, cámbienlo por <a href="#" data-p="portobelo">Portobelo</a> y <a href="#" data-p="aguaclara">Agua Clara</a>, todo en tierra.</div></div>';
+  if(d.date==='2026-11-28')h+='<div class="note info"><span class="e">🎧</span><div>¿Hay una rave ese día? Revisen las historias de los colectivos en <a href="#noche">Noche</a>.</div></div>';
+  $('#dayBody').innerHTML=h;
+}
+showDay(curDay);
+(function(){var x0=null,y0=null,el=$('#v-plan');el.addEventListener('touchstart',function(e){if(e.target.closest('.daychips'))return;x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+ el.addEventListener('touchend',function(e){if(x0==null)return;var dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.5){var n=curDay+(dx<0?1:-1);if(n>=0&&n<DAYS.length){showDay(n);window.scrollTo({top:0,behavior:'smooth'})}}x0=null})})();
+
+/* ---------- map ---------- */
+$$('#mapSeg button').forEach(function(b){b.addEventListener('click',function(){$$('#mapSeg button').forEach(function(x){x.classList.toggle('on',x===b)});$$('[data-pane]').forEach(function(p){p.hidden=p.dataset.pane!==b.dataset.paneGo});if(b.dataset.paneGo==='map'&&map)setTimeout(function(){map.invalidateSize()},50)})});
+var map=null,groups={},meMarker=null;
+var MC={hotel:['🏨 Hotel','#e2365b'],cultura:['🏛️ Cultura','#0b5fa5'],canal:['🚢 Canal','#0b5fa5'],natu:['🌿 Naturaleza','#2b7a4b'],comida:['🍽️ Comida','#b26f12'],noche:['🎧 Noche','#7b5cff'],metro:['🚇 Metro','#d01f3c']};
+function initMap(){
+  if(map){setTimeout(function(){map.invalidateSize()},60);return}
+  if(!window.L){$('#mapWrap').innerHTML='<div style="padding:20px">El mapa necesita internet. Usen la pestaña "Rutas".</div>';return}
+  map=L.map('map',{zoomControl:false}).setView([8.975,-79.53],13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+  L.control.zoom({position:'bottomleft'}).addTo(map);
+  Object.keys(MC).forEach(function(k){groups[k]=L.layerGroup().addTo(map)});
+  function add(id,o,cat){if(!o.ll)return;var p=phOf(o),hot=cat==='hotel';
+    var html=p?'<div class="pin photo'+(hot?' hotel':'')+'" style="border-color:'+MC[cat][1]+'"><img src="'+img(p)+'" alt=""></div>':'<div class="pin" style="background:'+MC[cat][1]+'"><span>'+(o.emo||MC[cat][0].split(' ')[0])+'</span></div>';
+    var sz=p?(hot?44:40):32;
+    L.marker(o.ll,{icon:L.divIcon({className:'',html:html,iconSize:[sz,sz],iconAnchor:p?[sz/2,sz/2]:[16,32]}),zIndexOffset:hot?1000:0}).on('click',function(){openSheet(id)}).addTo(groups[cat]);}
+  Object.keys(P).forEach(function(k){add(k,P[k],P[k].cat)});
+  Object.keys(NIGHT).forEach(function(k){add(k,NIGHT[k],'noche')});
+  var city=[];Object.keys(P).forEach(function(k){var o=P[k];if(o.ll&&o.ll[0]<9.02&&o.ll[1]>-79.6&&o.ll[0]>8.9)city.push(o.ll)});
+  map.fitBounds(city,{padding:[30,30]});
+  $('#mapChips').innerHTML=Object.keys(MC).map(function(k){return '<button data-k="'+k+'">'+MC[k][0]+'</button>'}).join('')+'<button data-k="__all">🗺️ Todo Panamá</button>';
+  $$('#mapChips button').forEach(function(b){b.addEventListener('click',function(){var k=b.dataset.k;if(k==='__all'){map.fitBounds([[8.75,-79.95],[9.5,-78.95]]);return}var off=b.classList.toggle('off');if(off)map.removeLayer(groups[k]);else groups[k].addTo(map)})});
+  setTimeout(function(){map.invalidateSize()},80);
+}
+$('#locBtn').addEventListener('click',function(){
+  if(!navigator.geolocation||!map){toast('No se pudo usar la ubicación');return}
+  toast('Buscando tu ubicación…');
+  navigator.geolocation.getCurrentPosition(function(p){var ll=[p.coords.latitude,p.coords.longitude];if(meMarker)meMarker.setLatLng(ll);else meMarker=L.marker(ll,{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[16,16]})}).addTo(map);map.setView(ll,15)},function(){toast('No se pudo obtener la ubicación')},{enableHighAccuracy:true,timeout:10000});
+});
+
+/* how list */
+$('#howList').innerHTML=['casco','miraflores','biomuseo','panviejo','mercado','cinta','cangrejo','uruguay','tocumen','sanblas','gatun','ancon'].map(function(k){var o=getP(k),p=phOf(o),how=o.how||[['walk',o.ret]];
+  return '<button class="how" data-p="'+k+'">'+(p?'<img src="'+img(p)+'" alt="" loading="lazy">':'<span class="ph2">📍</span>')+'<div><b>'+esc(o.n)+'</b><div class="chain">'+how.map(function(x){var m=M[x[0]];return '<span class="s" style="--c:'+m.c+'">'+m.ic+' '+esc(x[1])+'</span>'}).join('')+'</div></div><div class="cost">'+esc(o.cost||'')+'<small>'+esc(o.tm||'')+'</small></div></button>'}).join('');
+
+/* ---------- night ---------- */
+var POSTERS=[{p:'tantalo',when:'Sáb 28 · 23:30',ph:'casconight',t:'Rooftop Tántalo',s:'DJ bajo las estrellas, en el Casco'},{p:'moloko',when:'Sáb 28 · 01:00',ph:'club',t:'Techno underground',s:'Moloko+ · LGBT+ friendly · verificar'},{p:'cangrejo',when:'Jue 26 · 22:30',ph:'skynight',t:'El Cangrejo Radio',s:'A 15 minutos a pie del Riu'},{p:'strangers',when:'Sáb 28 · 22:00',ph:'bartender',t:'Cócteles de autor',s:'The Strangers Club'}];
+$('#nightPosters').innerHTML=POSTERS.map(function(x){return '<button class="poster" data-p="'+x.p+'"><img src="'+img(x.ph)+'" alt="" loading="lazy"><div class="in"><div class="when">'+esc(x.when)+'</div><h4>'+esc(x.t)+'</h4><p>'+esc(x.s)+'</p></div></button>'}).join('');
+var NG=[['all','Todo'],['tech','Techno'],['house','Electrónica'],['roof','Rooftops'],['cock','Cocteles'],['latin','Latino']];
+$('#nightChips').innerHTML=NG.map(function(g){return '<button class="chip'+(g[0]==='all'?' on':'')+'" data-g="'+g[0]+'">'+g[1]+'</button>'}).join('');
+$$('#nightChips .chip').forEach(function(b){b.addEventListener('click',function(){$$('#nightChips .chip').forEach(function(x){x.classList.toggle('on',x===b)});renderNight(b.dataset.g)})});
+function renderNight(f){var ks=Object.keys(NIGHT).filter(function(k){return f==='all'||NIGHT[k].g.indexOf(f)>=0});$('#nightCount').textContent=ks.length+' lugares';
+  $('#nightList').innerHTML=ks.map(function(k){var o=NIGHT[k];return '<button class="vrow" data-p="'+k+'"><img src="'+img(o.ph[0])+'" alt="" loading="lazy"><div><b>'+esc(o.n)+'</b><div class="sub">📍 '+esc(o.z)+' · '+esc(o.ret)+(o.ig?' · 📸 @'+esc(o.ig):'')+'</div><div class="g">'+o.g.map(function(g){return '<span class="gt '+GN[g][0]+'">'+GN[g][1]+'</span>'}).join('')+'</div></div><span class="ar">›</span></button>'}).join('')}
+renderNight('all');
+
+/* ---------- más ---------- */
+$$('#mTabs .chip').forEach(function(b){b.addEventListener('click',function(){$$('#mTabs .chip').forEach(function(x){x.classList.toggle('on',x===b)});$$('.mpane').forEach(function(p){p.classList.toggle('on',p.dataset.m===b.dataset.m)})})});
+$('#credits').innerHTML=Object.keys(CRED).sort().map(function(k){var c=CRED[k];return '<li><b>'+k+'</b>: <a href="'+c[2]+'" target="_blank" rel="noopener">'+esc(c[0])+'</a> · '+esc(c[1])+(ILL[k]?' · ilustrativa':'')+'</li>'}).join('');
+$('#shareBtn').addEventListener('click',function(){var d={title:'Panamá · Luna de miel',text:'Nuestro plan para Panamá 💍',url:location.href.split('#')[0]};if(navigator.share)navigator.share(d).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(d.url).then(function(){toast('🔗 Enlace copiado')})});
+
+/* budget */
+var rows=[
+ {id:'sanblas',e:'🏝️',l:'San Blas por el día',h:'tour para dos + tasas',m:1,v:{eco:250,mid:330,pre:700},c:'#0e8a8c'},
+ {id:'tour',e:'🐒',l:'Monkey Island',h:'para dos',m:1,v:{eco:140,mid:180,pre:400},c:'#2b7a4b'},
+ {id:'tickets',e:'🎟️',l:'Entradas',h:'Miraflores, Biomuseo y Panamá Viejo, para dos',m:1,v:{eco:109,mid:109,pre:109},c:'#0b5fa5'},
+ {id:'food',e:'🍽️',l:'Almuerzo y cena',h:'por día × 5',m:5,v:{eco:35,mid:85,pre:180},c:'#b26f12'},
+ {id:'special',e:'💍',l:'Cena especial',h:'para dos',m:1,v:{eco:60,mid:180,pre:300},c:'#e2365b'},
+ {id:'night',e:'🎧',l:'Noches',h:'covers y tragos',m:1,v:{eco:40,mid:120,pre:260},c:'#7b5cff'},
+ {id:'local',e:'🚇',l:'Transporte',h:'Metro, bus y Uber nocturno',m:1,v:{eco:25,mid:55,pre:110},c:'#e07b00'},
+ {id:'extras',e:'🛍️',l:'Compras y propinas',h:'total',m:1,v:{eco:60,mid:200,pre:450},c:'#8a94a2'}];
+var tier=store.get('pty-tier')||'mid',custom={};try{custom=JSON.parse(store.get('pty-custom3')||'{}')}catch(e){}
+function fmt(n){return n.toLocaleString('es-PE',{maximumFractionDigits:0})}
+function build(){var cw=$('#calcRows');cw.innerHTML=rows.map(function(r){var k=tier+'.'+r.id,v=custom[k]!=null?custom[k]:r.v[tier];return '<div class="crow"><span>'+r.e+'</span><label for="in-'+r.id+'">'+r.l+'<small>'+r.h+'</small></label><input id="in-'+r.id+'" data-k="'+k+'" type="number" min="0" inputmode="numeric" value="'+v+'"></div>'}).join('');
+  $$('input',cw).forEach(function(i){i.addEventListener('input',function(){var n=parseFloat(i.value);custom[i.dataset.k]=isNaN(n)?0:n;store.set('pty-custom3',JSON.stringify(custom));calc()})});
+  $$('#tierSeg button').forEach(function(b){b.classList.toggle('on',b.dataset.t===tier)});calc()}
+function calc(){var parts=rows.map(function(r){return (parseFloat($('#in-'+r.id).value)||0)*r.m}),sum=parts.reduce(function(a,b){return a+b},0),tot=Math.round(sum*1.1),fx=parseFloat($('#fx').value)||0;
+  $('#totUsd').textContent='US$ '+fmt(tot);$('#totPen').textContent='≈ S/ '+fmt(Math.round(tot*fx));
+  $('#stack').innerHTML=rows.map(function(r,i){return sum?'<span style="width:'+(parts[i]/sum*100)+'%;background:'+r.c+'"></span>':''}).join('');
+  $('#slg').innerHTML=rows.map(function(r,i){return '<span><i style="background:'+r.c+'"></i>'+r.e+' $'+fmt(parts[i])+'</span>'}).join('');
+  $('#perDay').innerHTML='👤 Por persona <b>US$ '+fmt(Math.round(tot/2))+'</b> · 📅 Por día <b>US$ '+fmt(Math.round(tot/6))+'</b>'}
+$$('#tierSeg button').forEach(function(b){b.addEventListener('click',function(){tier=b.dataset.t;store.set('pty-tier',tier);build()})});
+var fxIn=$('#fx'),sfx=store.get('pty-fx');if(sfx)fxIn.value=sfx;fxIn.addEventListener('input',function(){store.set('pty-fx',fxIn.value);calc()});build();
+
+/* checklist */
+var boxes=$$('.check input'),checks={};try{checks=JSON.parse(store.get('pty-checks')||'{}')}catch(e){}
+function prog(){var d=boxes.filter(function(b){return b.checked}).length,p=d/boxes.length*100;$('#ringP').setAttribute('stroke-dasharray',p+' 100');$('#progTxt').textContent=d+'/'+boxes.length+' listos'}
+boxes.forEach(function(b){b.checked=!!checks[b.id];b.addEventListener('change',function(){checks[b.id]=b.checked;store.set('pty-checks',JSON.stringify(checks));prog();if(b.checked)buzz()})});prog();
+
+/* start */
+go((location.hash||'#inicio').slice(1)||'inicio',false);
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')){navigator.serviceWorker.register('sw.js').catch(function(){})}
+})();
+</script>
+</body>
+</html>
